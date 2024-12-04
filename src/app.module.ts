@@ -13,6 +13,10 @@ import {
 } from './common/db/db.constant';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { StudentModule } from './student/student.module';
+import { SharedModule } from './shared/shared.module';
+import { CoursesModule } from './courses/courses.module';
+import { AbsencesModule } from './absences/absences.module';
 
 @Module({
   imports: [
@@ -37,6 +41,10 @@ import { AuthModule } from './auth/auth.module';
     }),
     UsersModule,
     AuthModule,
+    StudentModule,
+    SharedModule,
+    CoursesModule,
+    AbsencesModule,
   ],
 })
 export class AppModule implements OnModuleInit {

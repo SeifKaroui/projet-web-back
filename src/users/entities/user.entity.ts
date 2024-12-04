@@ -1,3 +1,4 @@
+//obsolete
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 import { TimeStampEntity } from 'src/common/db/timestamp.entity';
 import { Exclude } from 'class-transformer';

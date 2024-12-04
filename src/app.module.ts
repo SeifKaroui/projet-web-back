@@ -13,10 +13,15 @@ import {
 } from './common/db/db.constant';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { StudentModule } from './student/student.module';
 import { SharedModule } from './shared/shared.module';
 import { CoursesModule } from './courses/courses.module';
 import { AbsencesModule } from './absences/absences.module';
+import { PostModule } from './posts/post.module';
+import { CommentsModule } from './comments/comments.module';
+import { HomeworkModule } from './homework/homework.module';
+import { HomeworkSubmissionsModule } from './homework-submissions/homework-submissions.module';
+import { ResultsModule } from './results/results.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -45,6 +50,12 @@ import { AbsencesModule } from './absences/absences.module';
     SharedModule,
     CoursesModule,
     AbsencesModule,
+    PostModule,
+    CommentsModule,
+    HomeworkModule,
+    HomeworkSubmissionsModule,
+    ResultsModule,
+    MessagesModule,
   ],
 })
 export class AppModule implements OnModuleInit {

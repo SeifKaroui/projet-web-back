@@ -5,8 +5,7 @@ import { Student } from '../../users/entities/student.entity';
 import { Absence } from '../../absences/entities/absence.entity';
 import { Post } from '../../posts/entities/post.entity';
 import { Homework } from '../../homework/entities/homework.entity';
-import { Resource } from '../../shared/entities/resource.entity';
-
+import { Result } from '../../results/entities/result.entity';
 @Entity()
 export class Course {
   @PrimaryGeneratedColumn()
@@ -41,7 +40,7 @@ export class Course {
 
   @OneToMany(() => Homework, (homework) => homework.course)
   homeworks: Homework[];
+  @OneToMany(() => Result, (result) => result.course)
+  results: Result[];
 
-  @OneToMany(() => Resource, (resource) => resource.course)
-  resources: Resource[];
 }

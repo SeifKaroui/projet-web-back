@@ -1,14 +1,18 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-import { TimeStampEntity } from 'src/common/db/timestamp.entity';
-import { Exclude } from 'class-transformer';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  TableInheritance,
+} from 'typeorm';
+import { Comment } from '../../comments/entities/comment.entity';
+import { Message } from '../../messages/entities/message.entity';
 
 @Entity('users')
-export class User extends TimeStampEntity {
+@TableInheritance({ column: { type: 'varchar', name: 'type' } })
+export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column({ unique: true })
-  email: string;
 
   @Column()
   firstName: string;
@@ -16,7 +20,19 @@ export class User extends TimeStampEntity {
   @Column()
   lastName: string;
 
-  @Exclude()
+  @Column({ unique: true })
+  email: string;
+
   @Column()
   password: string;
+
+
+  @OneToMany(() => Comment, (comment) => comment.author)
+  comments: Comment[];
+
+  @OneToMany(() => Message, (message) => message.sender)
+  sentMessages: Message[];
+
+  @OneToMany(() => Message, (message) => message.receiver)
+  receivedMessages: Message[];
 }

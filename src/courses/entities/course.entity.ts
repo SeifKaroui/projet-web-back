@@ -1,7 +1,7 @@
 
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, OneToMany } from 'typeorm';
-import { Teacher } from '../../users/entities/teacher.entity';
-import { Student } from '../../users/entities/student.entity';
+import { Teacher } from '../../users/entities/user.entity';
+import { Student } from '../../users/entities/user.entity';
 import { Absence } from '../../absences/entities/absence.entity';
 import { Post } from '../../posts/entities/post.entity';
 import { Homework } from '../../homework/entities/homework.entity';
@@ -23,7 +23,7 @@ export class Course {
   @Column({ type: 'timestamp' })
   startDate: Date;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'date', default: () => 'CURRENT_TIMESTAMP' })
   endDate: Date;
 
   @ManyToOne(() => Teacher, (teacher) => teacher.courses)

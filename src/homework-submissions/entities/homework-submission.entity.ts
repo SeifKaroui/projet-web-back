@@ -6,7 +6,7 @@ import {
     CreateDateColumn,
   } from 'typeorm';
   import { Homework } from '../../homework/entities/homework.entity';
-  import { Student } from '../../users/entities/student.entity';
+  import { Student } from '../../users/entities/user.entity';
   
   @Entity()
   export class HomeworkSubmission {

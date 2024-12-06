@@ -2,15 +2,8 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { seedData } from './common/db/db-seeder';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import {
-  DB_DATABASE,
-  DB_HOST,
-  DB_PASSWORD,
-  DB_PORT,
-  DB_TYPE,
-  DB_USERNAME,
-} from './common/db/db.constant';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { AppDataSource } from './data-source';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { SharedModule } from './shared/shared.module';
@@ -28,25 +21,22 @@ import { MessagesModule } from './messages/messages.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService): any => ({
-        type: configService.get(DB_TYPE),
-        host: configService.get(DB_HOST),
-        port: +configService.get(DB_PORT),
-        username: configService.get(DB_USERNAME),
-        password: configService.get(DB_PASSWORD),
-        database: configService.get(DB_DATABASE),
+      useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
+        type: configService.get<string>('DB_TYPE') as any,
+        host: configService.get<string>('DB_HOST'),
+        port: +configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_DATABASE'),
         synchronize: true,
-        // logging: true,
         autoLoadEntities: true,
       }),
       inject: [ConfigService],
     }),
-    UsersModule,
     AuthModule,
-    StudentModule,
+    UsersModule,
     SharedModule,
     CoursesModule,
     AbsencesModule,

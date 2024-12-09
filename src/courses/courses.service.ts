@@ -126,8 +126,9 @@ export class CoursesService extends BaseCrudService<Course> {
     }
 
     if (student) {
-      course.students = [...course.students, student];
-      await super.create(course);
+      if(!course.students) course.students = [];  
+      course.students.push(student);
+      await this.repository.save(course);
     }
 
     return { message: 'Successfully joined' };

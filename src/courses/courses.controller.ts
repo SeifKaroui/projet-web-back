@@ -42,7 +42,7 @@ async findAll() {
     @Get(':id/students')
     async getCourseStudents(
       @Param('id', ParseIntPipe) courseId: number,
-     // @GetUser() teacher: Teacher
+      @GetUser() teacher: Teacher
     ) {
       return this.coursesService.getCourseStudents(courseId, teacher
         );

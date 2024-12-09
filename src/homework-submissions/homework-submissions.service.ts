@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HomeworkSubmission } from './entities/homework-submission.entity';
 import { Repository } from 'typeorm';
 import { Homework } from '../homework/entities/homework.entity';
 import { Student } from '../users/entities/user.entity';
 import * as fs from 'fs/promises';
+import { UpdateHomeworkSubmissionDto } from './dto/update-homework-submission.dto';
 
 @Injectable()
 export class HomeworkSubmissionsService {
@@ -99,6 +100,27 @@ export class HomeworkSubmissionsService {
     
     await this.submissionsRepository.remove(submission);
     return { message: 'Submission deleted successfully' };
+  }
+
+  
+  async gradeSubmission(submissionId: number, teacherId: string, updateDto: UpdateHomeworkSubmissionDto) {
+    const submission = await this.submissionsRepository.findOne({
+      where: { id: submissionId },
+      relations: ['homework', 'homework.teacher', 'homework.course'],
+    });
+  
+    if (!submission) {
+      throw new NotFoundException('Submission not found');
+    }
+  
+    if (submission.homework.teacher.id !== teacherId) {
+      throw new UnauthorizedException('You are not authorized to grade this submission');
+    }
+  
+    submission.grade = updateDto.grade;
+    submission.feedback = updateDto.feedback;
+  
+    return this.submissionsRepository.save(submission);
   }
   
   private async cleanupFile(filePath: string) {

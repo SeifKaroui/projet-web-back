@@ -11,10 +11,10 @@ async function dataExists<T>(repository: Repository<T>): Promise<boolean> {
 
 export async function seedData(dataSource: DataSource) {
   console.log('Starting database seed...');
-  const Teachers =await seedTeachers(dataSource);
-   const Students = await seedStudents(dataSource);
-  const Courses = await seedCourses(dataSource,Teachers,Students);
-  await seedHomework(dataSource, Courses, Teachers);
+  const teachers = await seedTeachers(dataSource);
+  const students = await seedStudents(dataSource);
+  const courses = await seedCourses(dataSource, teachers, students);
+  await seedHomework(dataSource, courses, teachers);
   console.log('Database seed completed');
 }
 
@@ -22,9 +22,10 @@ async function seedTeachers(dataSource: DataSource) {
   const teacherRepository = dataSource.getRepository(Teacher);
   if (await dataExists(teacherRepository)) {
     console.log('Teachers already exist - skipping seed');
-    return;
+    return await teacherRepository.find();
   }
-  
+
+  console.log('Seeding teachers...');
   const teachers = await teacherRepository.save([
     {
       id: '111fcda6-ebfc-4135-a1dd-e1003e608619',
@@ -36,14 +37,13 @@ async function seedTeachers(dataSource: DataSource) {
     },
     {
       id: '222fcda6-ebfc-4135-a1dd-e1003e608619',
-      email: 'prof.jones@university.com', 
+      email: 'prof.jones@university.com',
       firstName: 'Sarah',
-      lastName: 'Jones',
+      lastName: 'Jones', 
       password: await argon2.hash('teacher123'),
       type: 'teacher'
     }
   ]);
-  
   return teachers;
 }
 
@@ -51,21 +51,22 @@ async function seedStudents(dataSource: DataSource) {
   const studentRepository = dataSource.getRepository(Student);
   if (await dataExists(studentRepository)) {
     console.log('Students already exist - skipping seed');
-    return;
+    return await studentRepository.find();
   }
 
+  console.log('Seeding students...');
   const students = await studentRepository.save([
     {
       id: '333fcda6-ebfc-4135-a1dd-e1003e608619',
       email: 'student1@university.com',
-      firstName: 'Mike',
+      firstName: 'Mike', 
       lastName: 'Wilson',
       password: await argon2.hash('student123'),
       group: 'A1',
       type: 'student'
     },
     {
-      id: '444fcda6-ebfc-4135-a1dd-e1003e608619',
+      id: '444fcda6-ebfc-4135-a1dd-e1003e608619', 
       email: 'student2@university.com',
       firstName: 'Emma',
       lastName: 'Brown',
@@ -75,7 +76,7 @@ async function seedStudents(dataSource: DataSource) {
     },
     {
       id: '555fcda6-ebfc-4135-a1dd-e1003e608619',
-      email: 'student3@university.com',
+      email: 'student3@university.com', 
       firstName: 'James',
       lastName: 'Davis',
       password: await argon2.hash('student123'),
@@ -83,7 +84,6 @@ async function seedStudents(dataSource: DataSource) {
       type: 'student'
     }
   ]);
-
   return students;
 }
 
@@ -91,9 +91,10 @@ async function seedCourses(dataSource: DataSource, teachers: Teacher[], students
   const courseRepository = dataSource.getRepository(Course);
   if (await dataExists(courseRepository)) {
     console.log('Courses already exist - skipping seed');
-    return;
+    return await courseRepository.find();
   }
 
+  console.log('Seeding courses...');
   const courses = await courseRepository.save([
     {
       title: 'Introduction to Programming',
@@ -123,7 +124,6 @@ async function seedCourses(dataSource: DataSource, teachers: Teacher[], students
       students: students
     }
   ]);
-  
   return courses;
 }
 
@@ -134,23 +134,31 @@ async function seedHomework(dataSource: DataSource, courses: Course[], teachers:
     return;
   }
 
-  const homework = await homeworkRepository.save([
+  console.log('Seeding homework...');
+  await homeworkRepository.save([
     {
-      title: 'JavaScript Basics',
-      description: 'Complete exercises 1-5 from Chapter 1',
-      dueDate: new Date('2024-03-15'),
-      course: courses[0],
-      teacher: teachers[0]
+      description: 'Create a simple JavaScript application',
+      deadline: new Date('2027-03-15'),
+      teacher: teachers[0],
+      course: courses[0]
     },
     {
-      title: 'Programming Fundamentals',
-      description: 'Submit your first program',
-      dueDate: new Date('2024-03-30'),
-      course: courses[0],
-      teacher: teachers[0]
+      description: 'Build a REST API using Express.js',
+      deadline: new Date('2026-03-20'),
+      teacher: teachers[1],
+      course: courses[1]
+    },
+    {
+      description: 'Design and implement a database schema',
+      deadline: new Date('2024-03-25'),
+      teacher: teachers[0],
+      course: courses[2]
+    },
+    {
+      description: 'Create unit tests for your API',
+      deadline: new Date('2025-04-01'),
+      teacher: teachers[1],
+      course: courses[1]
     }
-    // ... any other homework entries
   ]);
-
-  return homework;
 }

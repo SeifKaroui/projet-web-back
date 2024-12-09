@@ -9,6 +9,7 @@ import {
   Request,
   Delete,
   Param,
+  Patch,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { HomeworkSubmissionsService } from './homework-submissions.service';
@@ -16,6 +17,7 @@ import { diskStorage } from 'multer';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateHomeworkSubmissionDto } from './dto/create-homework-submission.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse } from '@nestjs/swagger';
+import { UpdateHomeworkSubmissionDto } from './dto/update-homework-submission.dto';
 
 @Controller('homework-submissions')
 @UseGuards(AuthGuard('jwt'))
@@ -94,6 +96,17 @@ export class HomeworkSubmissionsController {
 ) {
   const studentId = req.user.id;
   return this.submissionsService.deleteSubmission(homeworkId, studentId);
+}
+
+@Patch(':id/grade')
+async gradeSubmission(
+  @Param('id') submissionId: number,
+  @Body() updateDto: UpdateHomeworkSubmissionDto,
+  @Request() req,
+) {
+  
+  const teacherId = req.user.id;
+  return this.submissionsService.gradeSubmission(submissionId, teacherId, updateDto);
 }
 
 }

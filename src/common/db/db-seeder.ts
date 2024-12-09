@@ -1,18 +1,29 @@
 import { User, Teacher, Student } from 'src/users/entities/user.entity';
 import { Course } from 'src/courses/entities/course.entity';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import * as argon2 from 'argon2';
 import { Homework } from 'src/homework/entities/homework.entity';
 
+async function dataExists<T>(repository: Repository<T>): Promise<boolean> {
+  const count = await repository.count();
+  return count > 0;
+}
+
 export async function seedData(dataSource: DataSource) {
-  const teachers = await seedTeachers(dataSource);
-  const students = await seedStudents(dataSource);
-  const courses = await seedCourses(dataSource, teachers, students);
-  await seedHomework(dataSource, courses, teachers);
+  console.log('Starting database seed...');
+  const Teachers =await seedTeachers(dataSource);
+   const Students = await seedStudents(dataSource);
+  const Courses = await seedCourses(dataSource,Teachers,Students);
+  await seedHomework(dataSource, Courses, Teachers);
+  console.log('Database seed completed');
 }
 
 async function seedTeachers(dataSource: DataSource) {
   const teacherRepository = dataSource.getRepository(Teacher);
+  if (await dataExists(teacherRepository)) {
+    console.log('Teachers already exist - skipping seed');
+    return;
+  }
   
   const teachers = await teacherRepository.save([
     {
@@ -38,6 +49,10 @@ async function seedTeachers(dataSource: DataSource) {
 
 async function seedStudents(dataSource: DataSource) {
   const studentRepository = dataSource.getRepository(Student);
+  if (await dataExists(studentRepository)) {
+    console.log('Students already exist - skipping seed');
+    return;
+  }
 
   const students = await studentRepository.save([
     {
@@ -74,6 +89,10 @@ async function seedStudents(dataSource: DataSource) {
 
 async function seedCourses(dataSource: DataSource, teachers: Teacher[], students: Student[]) {
   const courseRepository = dataSource.getRepository(Course);
+  if (await dataExists(courseRepository)) {
+    console.log('Courses already exist - skipping seed');
+    return;
+  }
 
   const courses = await courseRepository.save([
     {
@@ -110,31 +129,28 @@ async function seedCourses(dataSource: DataSource, teachers: Teacher[], students
 
 async function seedHomework(dataSource: DataSource, courses: Course[], teachers: Teacher[]) {
   const homeworkRepository = dataSource.getRepository(Homework);
+  if (await dataExists(homeworkRepository)) {
+    console.log('Homework already exists - skipping seed');
+    return;
+  }
 
-  await homeworkRepository.save([
+  const homework = await homeworkRepository.save([
     {
-      description: 'Create a simple JavaScript application',
-      deadline: new Date('2024-03-15'),
-      teacher: teachers[0],
+      title: 'JavaScript Basics',
+      description: 'Complete exercises 1-5 from Chapter 1',
+      dueDate: new Date('2024-03-15'),
       course: courses[0],
+      teacher: teachers[0]
     },
     {
-      description: 'Build a REST API using Express.js',
-      deadline: new Date('2024-03-20'),
-      teacher: teachers[1],
-      course: courses[1],
-    },
-    {
-      description: 'Design and implement a database schema',
-      deadline: new Date('2024-03-25'),
-      teacher: teachers[0],
-      course: courses[2],
-    },
-    {
-      description: 'Create unit tests for your API',
-      deadline: new Date('2024-04-01'),
-      teacher: teachers[1],
-      course: courses[1],
+      title: 'Programming Fundamentals',
+      description: 'Submit your first program',
+      dueDate: new Date('2024-03-30'),
+      course: courses[0],
+      teacher: teachers[0]
     }
+    // ... any other homework entries
   ]);
+
+  return homework;
 }

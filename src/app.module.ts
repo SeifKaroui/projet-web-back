@@ -15,6 +15,7 @@ import { HomeworkModule } from './homework/homework.module';
 import { HomeworkSubmissionsModule } from './homework-submissions/homework-submissions.module';
 import { ResultsModule } from './results/results.module';
 import { MessagesModule } from './messages/messages.module';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -32,6 +33,23 @@ import { MessagesModule } from './messages/messages.module';
         database: configService.get<string>('DB_DATABASE'),
         synchronize: true,
         autoLoadEntities: true,
+      }),
+      inject: [ConfigService],
+    }),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: configService.get('SMTP_HOST'),
+          port: configService.get('SMTP_PORT'),
+          auth: {
+            user: configService.get('SMTP_USER'),
+            pass: configService.get('SMTP_PASSWORD'),
+          },
+        },
+        defaults: {
+          from: configService.get('SMTP_FROM'),
+        },
       }),
       inject: [ConfigService],
     }),

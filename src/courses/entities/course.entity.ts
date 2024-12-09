@@ -1,11 +1,12 @@
 
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, OneToMany, JoinColumn } from 'typeorm';
 import { Teacher } from '../../users/entities/user.entity';
 import { Student } from '../../users/entities/user.entity';
 import { Absence } from '../../absences/entities/absence.entity';
 import { Post } from '../../posts/entities/post.entity';
 import { Homework } from '../../homework/entities/homework.entity';
 import { Result } from '../../results/entities/result.entity';
+import { DeleteDateColumn } from 'typeorm';
 @Entity()
 export class Course {
   @PrimaryGeneratedColumn()
@@ -20,13 +21,16 @@ export class Course {
   @Column()
   type: string; // e.g., 'lecture', 'tutorial', 'exam'
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   startDate: Date;
 
-  @Column({ type: 'date', default: () => 'CURRENT_TIMESTAMP' })
-  endDate: Date;
 
+  @Column({ unique: true, nullable: true })
+  courseCode: string;
+  @DeleteDateColumn()
+  deletedAt: Date;
   @ManyToOne(() => Teacher, (teacher) => teacher.courses)
+  @JoinColumn({ name: 'teacherId' })
   teacher: Teacher;
 
   @ManyToMany(() => Student, (student) => student.courses)
@@ -42,5 +46,7 @@ export class Course {
   homeworks: Homework[];
   @OneToMany(() => Result, (result) => result.course)
   results: Result[];
+  
+  
 
 }

@@ -27,8 +27,7 @@ async findAll() {
   @Delete(':id')
   archive(@Param('id',ParseIntPipe) id: number,@GetUser() teacher: Teacher
   ) {
-    return this.coursesService.archive(id, teacher 
-      );
+    return this.coursesService.archive(id, teacher );
   }
  
   
@@ -44,9 +43,9 @@ async findAll() {
       @Param('id', ParseIntPipe) courseId: number,
       @GetUser() teacher: Teacher
     ) {
-      return this.coursesService.getCourseStudents(courseId, teacher
-        );
+      return this.coursesService.getCourseStudents(courseId);
     }
+    //return the students of a course by invitation with the course id
    @Post(':id/join')
 async joinByInvitation(
   @Param('id', ParseIntPipe) courseId: number,

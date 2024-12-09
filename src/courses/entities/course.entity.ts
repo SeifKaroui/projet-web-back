@@ -7,8 +7,9 @@ import { Post } from '../../posts/entities/post.entity';
 import { Homework } from '../../homework/entities/homework.entity';
 import { Result } from '../../results/entities/result.entity';
 import { DeleteDateColumn } from 'typeorm';
+import { HasId } from 'src/common/generics/has-id.interface';
 @Entity()
-export class Course {
+export class Course implements HasId {
   @PrimaryGeneratedColumn()
   id: number;
 

@@ -18,7 +18,8 @@ export class CoursesController {
   }
   @Get()
 async findAllByTeacher(@Query('teacherId') teacherId?: number) {
-  return this.coursesService.findAllByTeacher(teacherId);
+  return this.coursesService.findAllByTeacher(//teacherId
+    );
 }
 @Get()
 async findAll() {

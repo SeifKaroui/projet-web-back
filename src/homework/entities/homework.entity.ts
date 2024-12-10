@@ -4,7 +4,6 @@ import {
   Column,
   ManyToOne,
   OneToMany,
-  CreateDateColumn,
 } from 'typeorm';
 import { Teacher } from '../../users/entities/user.entity';
 import { Course } from '../../courses/entities/course.entity';
@@ -24,9 +23,6 @@ export class Homework extends TimeStampEntity {
 
   @Column({ type: 'timestamp' })
   deadline: Date;
-
-  @ManyToOne(() => Teacher, (teacher) => teacher.homeworks)
-  teacher: Teacher;
 
   @ManyToOne(() => Course, (course) => course.homeworks)
   course: Course;

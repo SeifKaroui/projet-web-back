@@ -15,14 +15,13 @@ export class CreateHomeworkDTO {
 
   @IsNotEmpty()
   @IsNumber()
-  teacherId: number;
-
-  @IsNotEmpty()
-  @IsNumber()
   courseId: number;
 }
 
 export class UpdateHomeworkDTO {
+  @IsNumber()
+  homeworkId: number;
+
   @IsNotEmpty()
   @IsString()
   title: string;
@@ -46,10 +45,6 @@ export class HomeworkResponseDTO {
   description: string;
   deadline: Date;
   createdAt: Date;
-  teacher: {
-    id: number;
-    name: string;
-  };
   course: {
     id: number;
     title: string;

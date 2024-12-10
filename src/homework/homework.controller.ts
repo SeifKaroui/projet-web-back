@@ -1,9 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { Homework } from './entities/homework.entity';
 import { HomeworkService } from './homework.service';
 import { CreateHomeworkDTO } from './dto/homework.dto';
 import { UpdateResult } from 'typeorm';
+import { TeacherOwnershipGuard } from './homework.guard';
 
+@UseGuards(TeacherOwnershipGuard)
 @Controller('homework')
 export class HomeworkController {
     constructor(
@@ -22,7 +24,7 @@ export class HomeworkController {
     }
     @Post()
     createHomework(
-        @Body() createHomeworkDTO: CreateHomeworkDTO
+        @Body() createHomeworkDTO: CreateHomeworkDTO,
     ) {
         return this.homeworkService.create(createHomeworkDTO);
     }
@@ -41,3 +43,5 @@ export class HomeworkController {
 
     }
 }
+
+

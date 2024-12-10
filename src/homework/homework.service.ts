@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateHomeworkDTO } from './dto/homework.dto';
 import { CrudService } from 'src/common/generics/crud.service';
 import { Homework } from './entities/homework.entity';
 import { InjectRepository } from '@nestjs/typeorm';

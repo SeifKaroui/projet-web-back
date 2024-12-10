@@ -17,6 +17,9 @@ export class Homework extends TimeStampEntity {
   id: number;
 
   @Column({ type: 'text' })
+  title: string;
+
+  @Column({ type: 'text' })
   description: string;
 
   @Column({ type: 'timestamp' })

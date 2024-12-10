@@ -3,6 +3,10 @@ import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional } from 'class-
 export class CreateHomeworkDTO {
   @IsNotEmpty()
   @IsString()
+  title: string;
+
+  @IsNotEmpty()
+  @IsString()
   description: string;
 
   @IsNotEmpty()
@@ -19,6 +23,10 @@ export class CreateHomeworkDTO {
 }
 
 export class UpdateHomeworkDTO {
+  @IsNotEmpty()
+  @IsString()
+  title: string;
+
   @IsOptional()
   @IsString()
   description?: string;
@@ -34,6 +42,7 @@ export class UpdateHomeworkDTO {
 
 export class HomeworkResponseDTO {
   id: number;
+  title: string;
   description: string;
   deadline: Date;
   createdAt: Date;

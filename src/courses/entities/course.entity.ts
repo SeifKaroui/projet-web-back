@@ -23,8 +23,6 @@ export class Course {
   @Column({ type: 'timestamp' })
   startDate: Date;
 
-  @Column({ type: 'date', default: () => 'CURRENT_TIMESTAMP' })
-  endDate: Date;
 
   @ManyToOne(() => Teacher, (teacher) => teacher.courses)
   teacher: Teacher;

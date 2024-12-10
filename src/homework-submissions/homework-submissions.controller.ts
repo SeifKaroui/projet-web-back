@@ -10,6 +10,7 @@ import {
   Delete,
   Param,
   Patch,
+  Get,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { HomeworkSubmissionsService } from './homework-submissions.service';
@@ -107,6 +108,16 @@ async gradeSubmission(
   
   const teacherId = req.user.id;
   return this.submissionsService.gradeSubmission(submissionId, teacherId, updateDto);
+}
+
+@Get(':homeworkId/students-submissions')
+@ApiResponse({ status: 200, description: 'List of students and their submission status for the given homework.'})
+async getStudentsSubmissions(
+  @Param('homeworkId') homeworkId: number,
+  @Request() req
+) {
+  const teacherId = req.user.id;
+  return this.submissionsService.getStudentsSubmissionStatus(homeworkId, teacherId);
 }
 
 }

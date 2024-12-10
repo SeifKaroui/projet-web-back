@@ -6,6 +6,7 @@ import { Homework } from '../homework/entities/homework.entity';
 import { Student } from '../users/entities/user.entity';
 import * as fs from 'fs/promises';
 import { UpdateHomeworkSubmissionDto } from './dto/update-homework-submission.dto';
+import { Course } from 'src/courses/entities/course.entity';
 
 @Injectable()
 export class HomeworkSubmissionsService {
@@ -16,6 +17,8 @@ export class HomeworkSubmissionsService {
     private readonly homeworkRepository: Repository<Homework>,
     @InjectRepository(Student)
     private readonly studentsRepository: Repository<Student>,
+    @InjectRepository(Course)
+    private readonly coursesRepository: Repository<Course>,
   ) {}
 
   async submitHomework(studentId: string, homeworkId: number, filePath: string) {
@@ -130,4 +133,70 @@ export class HomeworkSubmissionsService {
       console.error('Error deleting file:', error);
     }
   }
+
+  async getStudentsSubmissionStatus(homeworkId: number, teacherId: string) {
+    const homework = await this.homeworkRepository.findOne({
+      where: { id: homeworkId },
+      relations: ['teacher', 'course', 'submissions', 'submissions.student'],
+    });
+
+    if (!homework) {
+      throw new NotFoundException('Homework not found');
+    }
+
+    if (homework.teacher.id !== teacherId) {
+      throw new UnauthorizedException('You are not authorized to view submissions for this homework');
+    }
+
+    
+    const course = await this.coursesRepository.findOne({
+      where: { id: homework.course.id },
+      relations: ['students'],
+    });
+
+    if (!course) {
+      throw new NotFoundException('Course not found');
+    }
+
+    const enrolledStudents = course.students;
+    const submissionsMap = new Map<string, HomeworkSubmission>();
+
+   
+    for (const submission of homework.submissions) {
+      submissionsMap.set(submission.student.id, submission);
+    }
+
+    
+    const response = enrolledStudents.map((student) => {
+      const submission = submissionsMap.get(student.id);
+      if (submission) {
+        
+        return {
+          student: {
+            id: student.id,
+            name: `${student.firstName} ${student.lastName}`,
+            email: student.email,
+          },
+          submission: {
+            fileUrl: submission.fileUrl,
+            grade: submission.grade !== null ? submission.grade : 'Not graded',
+            feedback: submission.feedback !== null ? submission.feedback : 'Not graded',
+          },
+        };
+      } else {
+        
+        return {
+          student: {
+            id: student.id,
+            name: `${student.firstName} ${student.lastName}`,
+            email: student.email,
+          },
+          submission: 'Not submitted',
+        };
+      }
+    });
+
+    return response;
+  }
+
 }

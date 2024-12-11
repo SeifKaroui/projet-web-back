@@ -22,12 +22,12 @@ import {
     @CreateDateColumn()
     submissionDate: Date;
   
-    @Column({ type: 'text' })
-    content: string;
-  
     @Column({ nullable: true })
     grade: number;
   
     @Column({ type: 'text', nullable: true })
     feedback: string;
+
+    @Column({ type: 'text' })
+    fileUrl: string; 
   }

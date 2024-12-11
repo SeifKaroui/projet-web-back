@@ -248,23 +248,46 @@ export class CoursesService extends CrudService<Course> {
    * @param courseId - The ID of the course
    * @returns An object containing the students array and count
    */
-  async getCourseStudents(courseId: number): Promise<{ students: Student[]; count: number }> {
-    // Find the course by ID and include the students relation
-    const course = await this.Courserepository.findOne({
-      where: {
+  async getCourseStudents(courseId: number) {
+    console.log('Searching for course:', courseId); // Debug log
+  
+    // First verify course exists
+    const courseExists = await this.Courserepository.findOne({
+      where: { 
         id: courseId,
-        deletedAt: IsNull(),
-      },
-      relations: ['students'],
+        deletedAt: IsNull()
+      }
     });
-    // If the course is not found, throw a NotFoundException
-    if (!course) {
+  
+    if (!courseExists) {
       throw new NotFoundException('Course not found');
     }
-    // Return the students array and count
+  
+    // Then get course with students
+    const course = await this.Courserepository
+      .createQueryBuilder('course')
+      .innerJoinAndSelect('course.students', 'student') 
+      .where('course.id = :courseId', { courseId })
+      .andWhere('course.deletedAt IS NULL')
+      .select([
+        'course.id',
+        'course.title',
+        'student.id',
+        'student.firstName',
+        'student.lastName',
+        'student.email',
+        'student.type'
+      ])
+      .getOne();
+  
+    // Debug logs
+    console.log('Found course:', course);
+    console.log('Students:', course?.students);
+  
     return {
-      students: course.students || [],
-      count: course.students?.length || 0,
+      courseId, title: course.title,
+      students: course?.students || [],
+      count: course?.students?.length || 0
     };
   }
 

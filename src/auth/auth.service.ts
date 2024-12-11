@@ -18,6 +18,7 @@ import {
   JWT_REFRESH_SECRET,
 } from './constants/auth.constant';
 import { User } from 'src/users/entities/user.entity';
+import { JwtUser } from './interfaces/jwt-user.interface';
 
 @Injectable()
 export class AuthService {
@@ -62,7 +63,7 @@ export class AuthService {
           firstName: user.firstName,
           lastName: user.lastName,
           type: user.type,
-        },
+        } as JwtUser,
         {
           secret: this.configService.get<string>(JWT_ACCESS_SECRET),
           expiresIn: JWT_ACCESS_EXPIRES_IN,
@@ -74,7 +75,7 @@ export class AuthService {
           firstName: user.firstName,
           lastName: user.lastName,
           type: user.type,
-        },
+        } as JwtUser,
         {
           secret: this.configService.get<string>(JWT_REFRESH_SECRET),
           expiresIn: JWT_REFRESH_EXPIRES_IN,

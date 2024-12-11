@@ -3,7 +3,6 @@ import { DataSource } from 'typeorm';
 import { seedData } from './common/db/db-seeder';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { AppDataSource } from './data-source';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { SharedModule } from './shared/shared.module';
@@ -15,6 +14,8 @@ import { HomeworkModule } from './homework/homework.module';
 import { HomeworkSubmissionsModule } from './homework-submissions/homework-submissions.module';
 import { ResultsModule } from './results/results.module';
 import { MessagesModule } from './messages/messages.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AccessTokenGuard } from './common/guards/accessToken.guard';
 
 @Module({
   imports: [
@@ -46,6 +47,12 @@ import { MessagesModule } from './messages/messages.module';
     HomeworkSubmissionsModule,
     ResultsModule,
     MessagesModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AccessTokenGuard,
+    },
   ],
 })
 export class AppModule implements OnModuleInit {

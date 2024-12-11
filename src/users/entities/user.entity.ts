@@ -8,18 +8,20 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import  { Comment } from '../../comments/entities/comment.entity';
-import  { Message } from '../../messages/entities/message.entity';
+import { Comment } from '../../comments/entities/comment.entity';
+import { Message } from '../../messages/entities/message.entity';
 import { Course } from 'src/courses/entities/course.entity';
 import { Absence } from 'src/absences/entities/absence.entity';
 import { HomeworkSubmission } from 'src/homework-submissions/entities/homework-submission.entity';
 import { Result } from 'src/results/entities/result.entity';
 import { Post } from 'src/posts/entities/post.entity';
 import { Homework } from 'src/homework/entities/homework.entity';
+import { UserType } from '../enums/user-type.enum';
+import { TimeStampEntity } from 'src/common/db/timestamp.entity';
 
 @Entity('users')
 @TableInheritance({ column: { type: 'varchar', name: 'type' } })
-export class User {
+export class User extends TimeStampEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -35,6 +37,8 @@ export class User {
   @Column()
   password: string;
 
+  @Column({ type: 'enum', enum: UserType })
+  type: UserType;
 
   @OneToMany(() => Comment, (comment) => comment.author)
   comments: Comment[];
@@ -46,12 +50,8 @@ export class User {
   receivedMessages: Message[];
 }
 
-
-@ChildEntity('student')
+@ChildEntity(UserType.Student)
 export class Student extends User {
-  @Column()
-  group: string;
-
   @ManyToMany(() => Course, (course) => course.students)
   @JoinTable()
   courses: Course[];
@@ -66,7 +66,7 @@ export class Student extends User {
   results: Result[];
 }
 
-@ChildEntity('teacher')
+@ChildEntity(UserType.Teacher)
 export class Teacher extends User {
   @OneToMany(() => Course, (course) => course.teacher)
   courses: Course[];

@@ -14,7 +14,8 @@ import { HomeworkModule } from './homework/homework.module';
 import { HomeworkSubmissionsModule } from './homework-submissions/homework-submissions.module';
 import { ResultsModule } from './results/results.module';
 import { MessagesModule } from './messages/messages.module';
-import { UploadsModule } from './uploads/uploads.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AccessTokenGuard } from './common/guards/accessToken.guard';
 
 @Module({
   imports: [
@@ -46,7 +47,12 @@ import { UploadsModule } from './uploads/uploads.module';
     HomeworkSubmissionsModule,
     ResultsModule,
     MessagesModule,
-    UploadsModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AccessTokenGuard,
+    },
   ],
 })
 export class AppModule implements OnModuleInit {

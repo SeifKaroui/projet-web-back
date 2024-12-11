@@ -8,6 +8,7 @@ export class CrudService<Entity extends HasId> {
   findAll(): Promise<Entity[]> {
     return this.repository.find();
   }
+
   findOne(id: ID): Promise<Entity> {
     return this.repository.findOne({
       where: { id } as any,
@@ -30,6 +31,7 @@ export class CrudService<Entity extends HasId> {
       throw new NotFoundException(`l'id ${id} n'existe pas`);
     return result;
   }
+
   async restore(id: ID): Promise<UpdateResult> {
     const result = await this.repository.restore(id);
     if (result.affected == 0)

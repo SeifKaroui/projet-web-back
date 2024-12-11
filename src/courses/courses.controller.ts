@@ -9,27 +9,28 @@ import { JoinCourseDto } from './dto/join-course.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('courses')
-@UseGuards(JwtAuthGuard, TeacherGuard)
+
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
  
-
+@UseGuards(JwtAuthGuard, TeacherGuard)
   @Post()
   @ApiBearerAuth()
   create(@Body() createCourseDto: CreateCourseDto, @GetUser() teacher: Teacher) {
     return this.coursesService.create(createCourseDto, teacher);
   }
-  @Get()
+  @UseGuards(JwtAuthGuard, TeacherGuard)
+  @Get('my-courses')
   @ApiBearerAuth()
-async findAllByTeacher(@Query('teacherId') teacherId?: number) {
-  return this.coursesService.findAllByTeacher(//teacherId
-    );
+async findAllByTeacher(@GetUser() teacher: Teacher) {
+  return this.coursesService.findAllByTeacher(teacher.id);
 }
-@Get()
+@Get('all')
 @ApiBearerAuth()
 async findAll() {
   return this.coursesService.findAll();
 }
+@UseGuards(JwtAuthGuard, TeacherGuard)
   @Delete(':id')
   @ApiBearerAuth()
   archive(@Param('id',ParseIntPipe) id: number,@GetUser() teacher: Teacher ) {
@@ -45,6 +46,7 @@ async findAll() {
     ) {
       return this.coursesService.joinCourseByCode(joinCourseDto.code, student);
     }
+    @UseGuards(JwtAuthGuard, TeacherGuard)
     @Get(':id/students')
     @ApiBearerAuth()
     async getCourseStudents(

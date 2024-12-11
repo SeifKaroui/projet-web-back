@@ -1,6 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
-import { ForbiddenException } from '@nestjs/common';
-import { Teacher } from 'src/users/entities/user.entity';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { UserType } from 'src/users/enums/user-type.enum';
 
 @Injectable()
@@ -9,7 +12,8 @@ export class TeacherGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
 
-    if (!user || user instanceof Teacher) {
+    // Check if the user exists and has the type 'Teacher'
+    if (!user || user.type !== UserType.Teacher) {
       throw new ForbiddenException('Only teachers can access this resource');
     }
 

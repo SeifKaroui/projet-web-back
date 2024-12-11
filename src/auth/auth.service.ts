@@ -17,6 +17,7 @@ import {
   JWT_REFRESH_EXPIRES_IN,
   JWT_REFRESH_SECRET,
 } from './constants/auth.constant';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -28,7 +29,7 @@ export class AuthService {
   async signUp(createUserDto: CreateUserDto): Promise<SignUpResponseDto> {
     const newUser = await this.usersService.create(createUserDto);
 
-    const tokens = await this.getTokens(newUser.id);
+    const tokens = await this.getTokens(newUser);
 
     return {
       user: newUser,
@@ -44,7 +45,7 @@ export class AuthService {
     const passwordMatches = await argon2.verify(user.password, data.password);
     if (!passwordMatches)
       throw new BadRequestException('Password is incorrect');
-    const tokens = await this.getTokens(user.id);
+    const tokens = await this.getTokens(user);
 
     return {
       user: user,
@@ -53,11 +54,14 @@ export class AuthService {
     };
   }
 
-  async getTokens(userId: string): Promise<JwtTokens> {
+  async getTokens(user: User): Promise<JwtTokens> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
-          sub: userId,
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          type: user.type,
         },
         {
           secret: this.configService.get<string>(JWT_ACCESS_SECRET),
@@ -66,7 +70,10 @@ export class AuthService {
       ),
       this.jwtService.signAsync(
         {
-          sub: userId,
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          type: user.type,
         },
         {
           secret: this.configService.get<string>(JWT_REFRESH_SECRET),
@@ -85,6 +92,6 @@ export class AuthService {
     const user = await this.usersService.findOne(userId);
     if (!user) throw new ForbiddenException('Access Denied');
 
-    return await this.getTokens(user.id);
+    return await this.getTokens(user);
   }
 }

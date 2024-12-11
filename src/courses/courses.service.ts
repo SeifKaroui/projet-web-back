@@ -190,15 +190,16 @@ export class CoursesService extends CrudService<Course> {
    * @param teacherId - The ID of the teacher
    * @returns An array of courses
    */
-  async findAllByTeacher(teacherId: string
+  async findAllByTeacher(teacher?: Teacher
     ): Promise<Course[]> {
     // Find courses by teacher ID and ensure they're not deleted
     return this.Courserepository.find({
       where: {
         deletedAt: IsNull(),
-       teacher: { id: teacherId },
+       teacher: { id: teacher?.id },
       },
       select: ['id', 'title', 'description', 'type', 'startDate', 'courseCode'],
+      relations: ['teacher'],
       order: {
         startDate: 'DESC',
       },

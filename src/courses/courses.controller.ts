@@ -23,7 +23,7 @@ export class CoursesController {
   @Get('my-courses')
   @ApiBearerAuth()
 async findAllByTeacher(@GetUser() teacher: Teacher) {
-  return this.coursesService.findAllByTeacher(teacher.id);
+  return this.coursesService.findAllByTeacher(teacher);
 }
 @Get('all')
 @ApiBearerAuth()

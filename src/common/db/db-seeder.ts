@@ -2,12 +2,14 @@ import { User, Teacher, Student } from 'src/users/entities/user.entity';
 import { Course } from 'src/courses/entities/course.entity';
 import { DataSource, Repository } from 'typeorm';
 import * as argon2 from 'argon2';
+
 import { Homework } from 'src/homework/entities/homework.entity';
 
 async function dataExists<T>(repository: Repository<T>): Promise<boolean> {
   const count = await repository.count();
   return count > 0;
 }
+
 
 export async function seedData(dataSource: DataSource) {
   console.log('Starting database seed...');
@@ -66,6 +68,7 @@ async function seedStudents(dataSource: DataSource) {
       type: 'student'
     },
     {
+
       id: '444fcda6-ebfc-4135-a1dd-e1003e608619', 
       email: 'student2@university.com',
       firstName: 'Emma',
@@ -123,6 +126,7 @@ async function seedCourses(dataSource: DataSource, teachers: Teacher[], students
       teacher: teachers[0],
       students: students
     }
+
   ]);
   return courses;
 }

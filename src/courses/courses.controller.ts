@@ -8,7 +8,7 @@ import { TeacherGuard } from '../auth/guards/teacher.guard';
 import { JoinCourseDto } from './dto/join-course.dto';
 
 @Controller('courses')
-//@UseGuards(JwtAuthGuard, TeacherGuard)
+@UseGuards(JwtAuthGuard, TeacherGuard)
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
@@ -26,8 +26,7 @@ async findAll() {
   return this.coursesService.findAll();
 }
   @Delete(':id')
-  archive(@Param('id',ParseIntPipe) id: number,@GetUser() teacher: Teacher
-  ) {
+  archive(@Param('id',ParseIntPipe) id: number,@GetUser() teacher: Teacher ) {
     return this.coursesService.archive(id, teacher );
   }
  

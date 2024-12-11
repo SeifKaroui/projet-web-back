@@ -6,11 +6,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import * as argon2 from 'argon2';
 import { CrudService } from 'src/common/generics/crud.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ID } from 'src/common/generics/has-id.interface';
+import { AuthUtils } from 'src/auth/utils/auth-utils';
 
 @Injectable()
 export class UsersService extends CrudService<User> {
@@ -20,39 +19,40 @@ export class UsersService extends CrudService<User> {
   ) {
     super(usersRepository);
   }
+
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const userByEmail = await this.findOneByEmail(createUserDto.email);
+    const userByEmail = await this.usersRepository.findOneBy({
+      email: createUserDto.email,
+    });
     if (userByEmail) {
       throw new BadRequestException('Email already used.');
     }
 
-    const hash = await this.hashPassword(createUserDto.password);
+    const hash = await AuthUtils.hashPassword(createUserDto.password);
     const newUser = {
       ...createUserDto,
       password: hash,
     };
-    return super.create(newUser);
+
+    return this.usersRepository.save(newUser);
   }
 
-  async update(id: ID, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.findOne(id);
-    if (!user) {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const userExists = await this.findOne(id);
+    if (!userExists) {
       throw new NotFoundException(`User with id:${id} not exists`);
     }
 
     const userByEmail = await this.findOneByEmail(updateUserDto.email);
-    if (userByEmail && userByEmail.id != (id as string)) {
+    const isEmailUsedByOthers = userByEmail && userByEmail.id != id;
+    if (updateUserDto.email && isEmailUsedByOthers) {
       throw new BadRequestException('Email already used.');
     }
 
     return super.update(id, updateUserDto);
   }
 
-  async findOneByEmail(email: string): Promise<User> {
-    return await this.usersRepository.findOneBy({ email });
-  }
-
-  hashPassword(data: string) {
-    return argon2.hash(data);
+  findOneByEmail(email: string): Promise<User> {
+    return this.usersRepository.findOneBy({ email });
   }
 }

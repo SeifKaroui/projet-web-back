@@ -3,6 +3,7 @@ import { Course } from 'src/courses/entities/course.entity';
 import { Absence } from 'src/absences/entities/absence.entity';
 import { DataSource } from 'typeorm';
 import * as argon2 from 'argon2';
+import { UserType } from 'src/users/enums/user-type.enum';
 import { Homework } from 'src/homework/entities/homework.entity';
 
 export async function seedData(dataSource: DataSource) {
@@ -18,12 +19,20 @@ async function seedTeachers(dataSource: DataSource) {
 
   const teachers = await teacherRepository.save([
     {
+      id: '107fcda6-ebfc-4135-a1dd-e1003e608619',
+      email: 'teacher1@email.com',
+      firstName: 'teacher1',
+      lastName: 'Ben foulen',
+      type: UserType.Teacher,
+      password: await argon2.hash('password'),
+    },
+    {
       id: '111fcda6-ebfc-4135-a1dd-e1003e608619',
       email: 'prof.smith@university.com',
       firstName: 'John',
       lastName: 'Smith',
       password: await argon2.hash('teacher123'),
-      type: 'teacher'
+      type: UserType.Teacher,
     },
     {
       id: '222fcda6-ebfc-4135-a1dd-e1003e608619',
@@ -31,7 +40,7 @@ async function seedTeachers(dataSource: DataSource) {
       firstName: 'Sarah',
       lastName: 'Jones',
       password: await argon2.hash('teacher123'),
-      type: 'teacher'
+      type: UserType.Teacher,
     }
   ]);
 
@@ -49,7 +58,7 @@ async function seedStudents(dataSource: DataSource) {
       lastName: 'Wilson',
       password: await argon2.hash('student123'),
       group: 'A1',
-      type: 'student'
+      type: UserType.Student,
     },
     {
       id: '444fcda6-ebfc-4135-a1dd-e1003e608619',
@@ -58,7 +67,23 @@ async function seedStudents(dataSource: DataSource) {
       lastName: 'Brown',
       password: await argon2.hash('student123'),
       group: 'A1',
-      type: 'student'
+      type: UserType.Student,
+    },
+    {
+      id: '207fcda6-ebfc-4135-a1dd-e1003e608619',
+      email: 'student1@email.com',
+      firstName: 'student1',
+      lastName: 'Ben foulen',
+      type: UserType.Student,
+      password: await argon2.hash('password'),
+    },
+    {
+      id: '307fcda6-ebfc-4135-a1dd-e1003e608619',
+      email: 'string',
+      firstName: 'testFirstname',
+      lastName: 'testLastname',
+      type: UserType.Teacher,
+      password: await argon2.hash('string'),
     },
     {
       id: '555fcda6-ebfc-4135-a1dd-e1003e608619',
@@ -67,7 +92,7 @@ async function seedStudents(dataSource: DataSource) {
       lastName: 'Davis',
       password: await argon2.hash('student123'),
       group: 'B1',
-      type: 'student'
+      type: UserType.Student,
     }
   ]);
 
@@ -85,7 +110,7 @@ async function seedCourses(dataSource: DataSource, teachers: Teacher[], students
       startDate: new Date('2024-03-01'),
       endDate: new Date('2024-06-30'),
       teacher: teachers[0],
-      students: [students[0], students[1]]
+      students: [students[0], students[1]],
     },
     {
       title: 'Web Development',
@@ -94,7 +119,7 @@ async function seedCourses(dataSource: DataSource, teachers: Teacher[], students
       startDate: new Date('2024-03-01'),
       endDate: new Date('2024-06-30'),
       teacher: teachers[1],
-      students: [students[1], students[2]]
+      students: [students[1], students[2]],
     },
     {
       title: 'Database Systems',
@@ -103,7 +128,7 @@ async function seedCourses(dataSource: DataSource, teachers: Teacher[], students
       startDate: new Date('2024-03-01'),
       endDate: new Date('2024-06-30'),
       teacher: teachers[0],
-      students: students
+      students: students,
     }
   ]);
 

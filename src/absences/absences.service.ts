@@ -62,29 +62,7 @@ export class AbsencesService extends CrudService<Absence> {
     return false; // L'utilisateur n'appartient ni à ce cours en tant qu'étudiant ni en tant qu'enseignant
   }
 
-  async AbsenceCount(studentId: string): Promise<any> {
-    const student = await this.studentRepository.findOne({ where: { id: studentId } });
-    if (!student) {
-      throw new NotFoundException('Student not found');
-    }
-
-    const justifiedCount = await this.absenceRepository.count({
-      where: { student, justified: true, deletedAt: null },
-    });
-
-    const nonJustifiedCount = await this.absenceRepository.count({
-      where: { student, justified: false, deletedAt: null },
-    });
-
-    const totalCount = justifiedCount + nonJustifiedCount;
-
-    return {
-      justifiedCount,
-      nonJustifiedCount,
-      totalCount,
-    };
-  }
-
+ 
   async createAbsence(createAbsenceDto: CreateAbsenceDto, teacherId: string): Promise<Absence> {
     const { studentId, courseId, date } = createAbsenceDto;
 

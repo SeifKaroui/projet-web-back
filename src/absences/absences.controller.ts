@@ -69,14 +69,6 @@ export class AbsencesController {
     return this.absencesService.getAbsencesForCurrentStudent(user.id, GetAbsencesByStudentDto);
   }
 
-  // for student 
-  @UseGuards(StudentGuard) 
-  @Get('student/absence-count-all-courses')
-  async AbsenceCount(
-    @GetUser() user: any,
-  ) {
-    return this.absencesService.AbsenceCount(user.id);
-  }
 
   // for student 
   @UseGuards(StudentGuard)

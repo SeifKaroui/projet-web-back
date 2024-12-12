@@ -16,7 +16,7 @@ interface GroupedAbsence {
   student: Student;
   absences: { course: Course; date: Date; justified: boolean }[];
 }
-
+//
 @Injectable()
 export class AbsencesService extends CrudService<Absence> {
   constructor(

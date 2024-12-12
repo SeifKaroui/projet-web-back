@@ -17,7 +17,7 @@ import { ValidateAbsenceDto } from './dto/validate-absence.dto';
 export class AbsencesController {
   constructor(private readonly absencesService: AbsencesService) {}
 
-  // for teacher
+  // for teacher :
   @Post('teacher/')
   @UseGuards(TeacherGuard) 
   async createAbsence(

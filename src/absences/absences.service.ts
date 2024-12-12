@@ -11,7 +11,7 @@ import { GetAbsencesByTeacherDto } from './dto/get-absences-by-teacher.dto';
 import { CrudService } from 'src/common/generics/crud.service';
 import { GetAbsencesByStudentDto } from './dto/get-absences-by-student.dto';
 import { ValidateAbsenceDto } from './dto/validate-absence.dto';
-
+///
 interface GroupedAbsence {
   student: Student;
   absences: { course: Course; date: Date; justified: boolean }[];

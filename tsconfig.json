@@ -16,6 +16,15 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "plugins": [
+      {
+        "name": "@nestjs/swagger-plugin",
+        "options": {
+          "classValidatorShim": true, // Prend en compte les décorateurs de class-validator (comme @IsString)
+          "introspectComments": true // Génère des descriptions basées sur les commentaires de code
+        }
+      }
+    ]
   }
 }

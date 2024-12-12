@@ -16,6 +16,7 @@ import { ResultsModule } from './results/results.module';
 import { MessagesModule } from './messages/messages.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AccessTokenGuard } from './common/guards/accessToken.guard';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { AccessTokenGuard } from './common/guards/accessToken.guard';
     HomeworkSubmissionsModule,
     ResultsModule,
     MessagesModule,
+    UploadsModule,
   ],
   providers: [
     {

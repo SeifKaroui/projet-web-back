@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUUID, IsDateString, IsBoolean, IsInt } from 'class-validator';
+import { IsUUID, IsDateString, IsBoolean, IsInt, IsString, IsOptional } from 'class-validator';
 
 export class CreateAbsenceDto {
 
@@ -17,4 +17,8 @@ export class CreateAbsenceDto {
 
   @IsBoolean()
   justified: boolean;
+
+  @IsString()
+  @IsOptional()
+  justification: string; 
 }

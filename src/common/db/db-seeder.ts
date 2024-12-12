@@ -177,18 +177,21 @@ async function seedAbsences(dataSource: DataSource, students: Student[], courses
       course: courses[0],
       date: new Date('2024-03-05'),
       justified: false,
+      justification: null,
     },
     {
       student: students[0],
       course: courses[0],
       date: new Date('2024-03-12'),
       justified: false,
+      justification: null,
     },
     {
       student: students[0],
       course: courses[0],
       date: new Date('2024-03-18'),
       justified: true,  // Justified absence
+      justification: null,
     },
 
     // Student 2
@@ -197,12 +200,14 @@ async function seedAbsences(dataSource: DataSource, students: Student[], courses
       course: courses[1],
       date: new Date('2024-03-10'),
       justified: true,
+      justification: null,
     },
     {
       student: students[1],
       course: courses[1],
       date: new Date('2024-03-20'),
       justified: false,  // Unjustified absence
+      justification: null,
     },
 
     // Student 3
@@ -211,18 +216,21 @@ async function seedAbsences(dataSource: DataSource, students: Student[], courses
       course: courses[2],
       date: new Date('2024-03-15'),
       justified: false,
+      justification: null,
     },
     {
       student: students[2],
       course: courses[2],
       date: new Date('2024-03-22'),
       justified: true,  // Justified absence
+      justification: null,
     },
     {
       student: students[2],
       course: courses[2],
       date: new Date('2024-03-28'),
       justified: false,
+      justification: null,
     },
 
     // Student 1 in another course
@@ -231,6 +239,7 @@ async function seedAbsences(dataSource: DataSource, students: Student[], courses
       course: courses[0],
       date: new Date('2024-03-12'),
       justified: false,
+      justification: null,
     }
   ]);
 }

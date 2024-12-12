@@ -29,7 +29,6 @@ export class UploadsController {
     return this.uploadsService.saveFiles(files);
   }
 
-  @Public()
   @Get(':fileId')
   async retrieve(
     @Param('fileId', ParseIntPipe) fileId: number,

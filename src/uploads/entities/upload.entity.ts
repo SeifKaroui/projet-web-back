@@ -3,8 +3,11 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('uploads')
 export class Upload extends TimeStampEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  originalname: string;
 
   @Column()
   filename: string;
@@ -13,5 +16,5 @@ export class Upload extends TimeStampEntity {
   size: number;
 
   @Column()
-  mime: string;
+  mimetype: string;
 }

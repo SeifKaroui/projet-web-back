@@ -64,6 +64,13 @@ async joinByInvitation(
 ) {
   return this.coursesService.joinCourseByInvitation(courseId, student );
 }
+@UseGuards(JwtAuthGuard)
+@Get('my-enrolled-courses')
+@ApiBearerAuth()
+async getEnrolledCourses(@GetUser() student: Student) {
+  return this.coursesService.findStudentCourses(student);
+}
+
 
 }
 

@@ -327,4 +327,42 @@ export class CoursesService extends CrudService<Course> {
     // Return a success message
     return { message: 'Successfully joined' };
   }
+  async findStudentCourses(student: Student): Promise<Course[]> {
+    const courses = await this.Courserepository
+      .createQueryBuilder('course')
+      .innerJoin('course.students', 'student')
+      .where('student.id = :studentId', { studentId: student.id })
+      .andWhere('course.deletedAt IS NULL')
+      .select([
+        'course.id',
+        'course.title',
+        'course.description',
+        'course.type',
+        'course.startDate',
+        'course.courseCode',
+      ])
+      .orderBy('course.startDate', 'DESC')
+      .getMany();
+  
+    return courses;
+  }
+    /*  const course = await this.Courserepository
+      .createQueryBuilder('course')
+      .innerJoinAndSelect('course.students', 'student') 
+      .where('course.id = :courseId', { courseId })
+      .andWhere('course.deletedAt IS NULL')
+      .select([
+        'course.id',
+        'course.title',
+        'student.id',
+        'student.firstName',
+        'student.lastName',
+        'student.email',
+        'student.type'
+      ])
+      .getOne();
+  
+    // Debug logs
+    console.log('Found course:', course);
+    console.log('Students:', course?.students);*/
 }

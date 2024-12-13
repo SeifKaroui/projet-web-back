@@ -1,5 +1,5 @@
 
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, OneToMany, JoinColumn, JoinTable } from 'typeorm';
 import { Teacher } from '../../users/entities/user.entity';
 import { Student } from '../../users/entities/user.entity';
 import { Absence } from '../../absences/entities/absence.entity';
@@ -35,6 +35,7 @@ export class Course implements HasId {
   teacher: Teacher;
 
   @ManyToMany(() => Student, (student) => student.courses)
+
   students: Student[];
 
   @OneToMany(() => Absence, (absence) => absence.course)

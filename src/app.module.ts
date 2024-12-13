@@ -20,6 +20,7 @@ import { AccessTokenGuard } from './common/guards/accessToken.guard';
 
 import { MailerModule } from '@nestjs-modules/mailer';
 
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     HomeworkSubmissionsModule,
     ResultsModule,
     MessagesModule,
+    UploadsModule,
   ],
   providers: [
     {

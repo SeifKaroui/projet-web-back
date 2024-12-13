@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional } from 'class-validator';
+import { Upload } from 'src/uploads/entities/upload.entity';
 
 export class CreateHomeworkDTO {
   @IsNotEmpty()
@@ -16,6 +17,9 @@ export class CreateHomeworkDTO {
   @IsNotEmpty()
   @IsNumber()
   courseId: number;
+  
+
+
 }
 
 export class UpdateHomeworkDTO {
@@ -37,6 +41,7 @@ export class UpdateHomeworkDTO {
   @IsOptional()
   @IsNumber()
   courseId?: number;
+  
 }
 
 export class HomeworkResponseDTO {

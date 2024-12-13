@@ -9,6 +9,7 @@ import { Teacher } from '../../users/entities/user.entity';
 import { Course } from '../../courses/entities/course.entity';
 import { HomeworkSubmission } from '../../homework-submissions/entities/homework-submission.entity';
 import { TimeStampEntity } from 'src/common/db/timestamp.entity';
+import { Upload } from 'src/uploads/entities/upload.entity';
 
 @Entity()
 export class Homework extends TimeStampEntity {
@@ -29,4 +30,7 @@ export class Homework extends TimeStampEntity {
 
   @OneToMany(() => HomeworkSubmission, (submission) => submission.homework)
   submissions: HomeworkSubmission[];
+
+  @OneToMany(()=> Upload,"" )
+  files: Upload[];
 }

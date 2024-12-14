@@ -1,10 +1,11 @@
-import {  Injectable, Req } from '@nestjs/common';
+import {  Inject, Injectable, Req } from '@nestjs/common';
 import { CrudService } from 'src/common/generics/crud.service';
 import { Homework } from './entities/homework.entity';
 import { DeepPartial, Repository } from 'typeorm';
 import { ID } from 'src/common/generics/has-id.interface';
 import { UploadsService } from 'src/uploads/uploads.service';
 import { Upload } from 'src/uploads/entities/upload.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 
 
@@ -12,6 +13,7 @@ import { Upload } from 'src/uploads/entities/upload.entity';
 export class HomeworkService extends CrudService<Homework> {
     constructor(
         private readonly uploadsService: UploadsService,
+        @InjectRepository(Homework)
         public homeworkRepository: Repository<Homework>
     ) {
         super(homeworkRepository);

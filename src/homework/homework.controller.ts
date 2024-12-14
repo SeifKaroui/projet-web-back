@@ -8,13 +8,12 @@ import { CreateHomeworkDTO } from './dto/homework.dto';
 import { CustomFilesInterceptor } from 'src/common/interceptors/custom-files.interceptor';
 
 @ApiBearerAuth()
-@UseGuards(TeacherOwnershipGuard)
 @Controller('homework')
 export class HomeworkController {
     constructor(
         private homeworkService: HomeworkService,
     ) { }
-
+      
     @Get()
     getHomework(): Promise<Homework[]> {
         return this.homeworkService.findAll();
@@ -26,6 +25,7 @@ export class HomeworkController {
         return this.homeworkService.findOne(id);
     }
     @Post()
+    @UseGuards(TeacherOwnershipGuard)
     @UseInterceptors(CustomFilesInterceptor)
     createHomework(
         @UploadedFiles() files: Express.Multer.File[],
@@ -35,6 +35,7 @@ export class HomeworkController {
         return this.homeworkService.create_hw(createHomeworkDTO, files);
     }
     @Patch(':id')
+    @UseGuards(TeacherOwnershipGuard)
     @UseInterceptors(CustomFilesInterceptor)
     updateHomework(
         @Param('id') id: number,
@@ -45,6 +46,7 @@ export class HomeworkController {
         return this.homeworkService.update_hw(id, updateHomeworkDTO,files);
     }
     @Patch("delete/:id")
+    @UseGuards(TeacherOwnershipGuard)
     deleteHomework(
         @Param('id') id: number
     ): Promise<UpdateResult> {

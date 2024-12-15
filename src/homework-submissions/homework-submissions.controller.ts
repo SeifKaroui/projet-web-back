@@ -19,6 +19,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { CreateHomeworkSubmissionDto } from './dto/create-homework-submission.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse } from '@nestjs/swagger';
 import { UpdateHomeworkSubmissionDto } from './dto/update-homework-submission.dto';
+import { JwtUser } from 'src/auth/interfaces/jwt-user.interface';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
 
 @Controller('homework-submissions')
 @UseGuards(AuthGuard('jwt'))
@@ -79,45 +81,45 @@ export class HomeworkSubmissionsController {
   async submitHomework(
     @Body() dto: CreateHomeworkSubmissionDto,
     @UploadedFile() file: Express.Multer.File,
-    @Request() req,
+    @GetUser() user: JwtUser,
   ) {
 
 
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
-    const studentId = req.user.id;
-    return this.submissionsService.submitHomework(studentId, dto.homeworkId, file.path);
+    console.log(user.id);
+    return this.submissionsService.submitHomework(user.id, dto.homeworkId, file.path);
   }
   
   @Delete(':id')
   async deleteSubmission(
   @Param('id') homeworkId: number,
-  @Request() req,
+  @GetUser() user: JwtUser,
 ) {
-  const studentId = req.user.id;
-  return this.submissionsService.deleteSubmission(homeworkId, studentId);
+
+  return this.submissionsService.deleteSubmission(homeworkId, user.id);
 }
 
 @Patch(':id/grade')
 async gradeSubmission(
   @Param('id') submissionId: number,
   @Body() updateDto: UpdateHomeworkSubmissionDto,
-  @Request() req,
+  @GetUser() user: JwtUser,
 ) {
   
-  const teacherId = req.user.id;
-  return this.submissionsService.gradeSubmission(submissionId, teacherId, updateDto);
+
+  return this.submissionsService.gradeSubmission(submissionId, user.id, updateDto);
 }
 
 @Get(':homeworkId/students-submissions')
 @ApiResponse({ status: 200, description: 'List of students and their submission status for the given homework.'})
 async getStudentsSubmissions(
   @Param('homeworkId') homeworkId: number,
-  @Request() req
+  @GetUser() user: JwtUser,
 ) {
-  const teacherId = req.user.id;
-  return this.submissionsService.getStudentsSubmissionStatus(homeworkId, teacherId);
+  
+  return this.submissionsService.getStudentsSubmissionStatus(homeworkId, user.id);
 }
 
 }

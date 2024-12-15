@@ -88,7 +88,6 @@ export class HomeworkSubmissionsController {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
-    console.log(user.id);
     return this.submissionsService.submitHomework(user.id, dto.homeworkId, file.path);
   }
   

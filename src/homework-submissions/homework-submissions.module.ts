@@ -6,9 +6,10 @@ import { HomeworkSubmission } from './entities/homework-submission.entity';
 import { Homework } from '../homework/entities/homework.entity';
 import { Student } from '../users/entities/user.entity';
 import { Course } from 'src/courses/entities/course.entity';
+import { UploadsModule } from 'src/uploads/uploads.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([HomeworkSubmission, Homework, Student,Course])],
+  imports: [TypeOrmModule.forFeature([HomeworkSubmission, Homework, Student,Course]),UploadsModule],
   controllers: [HomeworkSubmissionsController],
   providers: [HomeworkSubmissionsService],
 })

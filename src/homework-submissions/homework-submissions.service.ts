@@ -1,12 +1,13 @@
-import { Injectable, NotFoundException, ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HomeworkSubmission } from './entities/homework-submission.entity';
 import { Repository } from 'typeorm';
 import { Homework } from '../homework/entities/homework.entity';
 import { Student } from '../users/entities/user.entity';
-import * as fs from 'fs/promises';
+
 import { UpdateHomeworkSubmissionDto } from './dto/update-homework-submission.dto';
 import { Course } from 'src/courses/entities/course.entity';
+import { UploadsService } from 'src/uploads/uploads.service';
 
 @Injectable()
 export class HomeworkSubmissionsService {
@@ -19,10 +20,13 @@ export class HomeworkSubmissionsService {
     private readonly studentsRepository: Repository<Student>,
     @InjectRepository(Course)
     private readonly coursesRepository: Repository<Course>,
+    private readonly uploadsService: UploadsService,
   ) {}
 
-  async submitHomework(studentId: string, homeworkId: number, filePath: string) {
+  async submitHomework(studentId: string, homeworkId: number, file: Express.Multer.File) {
+    let upload =null
     try{
+    const [upload] = await this.uploadsService.saveFiles([file]);
     const homework = await this.homeworkRepository.findOne({
       where: { id: homeworkId },
       relations: ['course'],
@@ -64,11 +68,11 @@ export class HomeworkSubmissionsService {
     const submission = this.submissionsRepository.create({
       homework,
       student,
-      fileUrl: filePath,
+      upload,
     });
     return this.submissionsRepository.save(submission);}
     catch (error) {
-      await this.cleanupFile(filePath);
+      if (upload) {await this.uploadsService.deleteUpload(upload);}
       throw error;
     }
   }
@@ -78,7 +82,7 @@ export class HomeworkSubmissionsService {
         homework: { id: homeworkId },
         student: { id: studentId }
       },
-      relations: ['student']
+      relations: ['student','upload']
     });
   
     if (!submission) {
@@ -94,22 +98,23 @@ export class HomeworkSubmissionsService {
     }
   
    
-    try {
-      await fs.unlink(submission.fileUrl);
-    } catch (error) {
-      console.error('Error deleting file:', error);
-    }
+   
   
     
-    await this.submissionsRepository.remove(submission);
-    return { message: 'Submission deleted successfully' };
+    try {
+      // Using softRemove instead of remove for soft delete
+      await this.submissionsRepository.softRemove(submission);
+      return { message: 'Submission deleted successfully' };
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to delete submission');
+    }
   }
 
   
   async gradeSubmission(submissionId: number, teacherId: string, updateDto: UpdateHomeworkSubmissionDto) {
     const submission = await this.submissionsRepository.findOne({
       where: { id: submissionId },
-      relations: ['homework', 'homework.teacher', 'homework.course'],
+      relations: ['homework', 'homework.teacher', 'homework.course','upload'],
     });
   
     if (!submission) {
@@ -126,14 +131,7 @@ export class HomeworkSubmissionsService {
     return this.submissionsRepository.save(submission);
   }
   
-  private async cleanupFile(filePath: string) {
-    try {
-      await fs.unlink(filePath);
-    } catch (error) {
-      console.error('Error deleting file:', error);
-    }
-  }
-
+  
   async getStudentsSubmissionStatus(homeworkId: number, teacherId: string) {
     const homework = await this.homeworkRepository.findOne({
       where: { id: homeworkId },
@@ -179,7 +177,7 @@ export class HomeworkSubmissionsService {
           },
           submission: {
             submissionID : submission.id,
-            fileUrl: submission.fileUrl,
+            uploadId: submission.upload.id,
             grade: submission.grade !== null ? submission.grade : 'Not graded',
             feedback: submission.feedback !== null ? submission.feedback : 'Not graded',
           },

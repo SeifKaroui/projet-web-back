@@ -52,32 +52,7 @@ export class HomeworkSubmissionsController {
     },
   })
 
-  @UseInterceptors(
-    FileInterceptor('file', {
-      limits: { fileSize: 5 * 1024 * 1024 },
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          cb(null, `${Date.now()}-${file.originalname}`);
-        },
-      }),
-      fileFilter: (req, file, callback) => {
-        const allowedMimes = [
-          'application/pdf', 
-          'application/msword',
-          'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
-          'application/vnd.ms-powerpoint',
-          'application/vnd.openxmlformats-officedocument.presentationml.presentation', 
-          'text/plain'
-        ];
-        if (allowedMimes.includes(file.mimetype)) {
-          callback(null, true);
-        } else {
-          callback(new BadRequestException('Invalid file type. Allowed types: PDF, DOC, DOCX, PPT, PPTX, TXT'), false);
-        }
-      },
-    }),
-  )
+  @UseInterceptors(FileInterceptor('file'))
   async submitHomework(
     @Body() dto: CreateHomeworkSubmissionDto,
     @UploadedFile() file: Express.Multer.File,
@@ -88,7 +63,7 @@ export class HomeworkSubmissionsController {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
-    return this.submissionsService.submitHomework(user.id, dto.homeworkId, file.path);
+    return this.submissionsService.submitHomework(user.id, dto.homeworkId, file);
   }
   
   @Delete(':id')

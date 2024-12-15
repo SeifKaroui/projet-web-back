@@ -178,6 +178,7 @@ export class HomeworkSubmissionsService {
             email: student.email,
           },
           submission: {
+            submissionID : submission.id,
             fileUrl: submission.fileUrl,
             grade: submission.grade !== null ? submission.grade : 'Not graded',
             feedback: submission.feedback !== null ? submission.feedback : 'Not graded',

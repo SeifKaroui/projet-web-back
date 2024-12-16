@@ -8,5 +8,6 @@ import { Upload } from './entities/upload.entity';
   imports: [TypeOrmModule.forFeature([Upload])],
   controllers: [UploadsController],
   providers: [UploadsService],
+  exports: [UploadsService],
 })
 export class UploadsModule {}

@@ -103,7 +103,7 @@ async function seedCourses(dataSource: DataSource, teachers: Teacher[], students
   const courseRepository = dataSource.getRepository(Course);
 
   const courses = await courseRepository.save([
-    {
+    { id: 1,
       title: 'Introduction to Programming',
       description: 'Learn basics of programming with JavaScript',
       type: 'lecture',
@@ -112,7 +112,7 @@ async function seedCourses(dataSource: DataSource, teachers: Teacher[], students
       teacher: teachers[0],
       students: [students[0], students[1]],
     },
-    {
+    { id:2,
       title: 'Web Development',
       description: 'Full stack web development with Node.js',
       type: 'tutorial',
@@ -121,7 +121,7 @@ async function seedCourses(dataSource: DataSource, teachers: Teacher[], students
       teacher: teachers[1],
       students: [students[1], students[2]],
     },
-    {
+    { id:3,
       title: 'Database Systems',
       description: 'Introduction to SQL and NoSQL databases',
       type: 'lecture',
@@ -139,28 +139,34 @@ async function seedHomework(dataSource: DataSource, courses: Course[], teachers:
   const homeworkRepository = dataSource.getRepository(Homework);
 
   await homeworkRepository.save([
-    {
+
+    { id:1,
       title: 'Homework 1',
       description: 'Create a simple JavaScript application',
-      deadline: new Date('2024-03-15'),
+      deadline: new Date('2025-03-15'),
+      teacher: teachers[0],
       course: courses[0],
     },
-    {
+    { id:2,
       title: 'Homework 2',
       description: 'Build a REST API using Express.js',
-      deadline: new Date('2024-03-20'),
+      deadline: new Date('2026-03-20'),
+      teacher: teachers[1],
       course: courses[1],
     },
-    {
+    { id:3,
+
       title: 'Homework 3',
       description: 'Design and implement a database schema',
       deadline: new Date('2024-03-25'),
       course: courses[2],
     },
-    {
+
+    { id:4,
       title: 'Homework 4',
       description: 'Create unit tests for your API',
-      deadline: new Date('2024-04-01'),
+      deadline: new Date('2027-04-01'),
+      teacher: teachers[1],
       course: courses[1],
     }
   ]);
@@ -172,21 +178,21 @@ async function seedAbsences(dataSource: DataSource, students: Student[], courses
   // Simulate multiple absences per student in each course
   await absenceRepository.save([
     // Student 1
-    {
+    { id:1,
       student: students[0],
       course: courses[0],
       date: new Date('2024-03-05'),
       justified: false,
       justification: null,
     },
-    {
+    { id:2,
       student: students[0],
       course: courses[0],
       date: new Date('2024-03-12'),
       justified: false,
       justification: null,
     },
-    {
+    { id:3,
       student: students[0],
       course: courses[0],
       date: new Date('2024-03-18'),
@@ -195,14 +201,14 @@ async function seedAbsences(dataSource: DataSource, students: Student[], courses
     },
 
     // Student 2
-    {
+    { id:4,
       student: students[1],
       course: courses[1],
       date: new Date('2024-03-10'),
       justified: true,
       justification: null,
     },
-    {
+    { id:5,
       student: students[1],
       course: courses[1],
       date: new Date('2024-03-20'),
@@ -211,21 +217,21 @@ async function seedAbsences(dataSource: DataSource, students: Student[], courses
     },
 
     // Student 3
-    {
+    { id:6,
       student: students[2],
       course: courses[2],
       date: new Date('2024-03-15'),
       justified: false,
       justification: null,
     },
-    {
+    { id:7,
       student: students[2],
       course: courses[2],
       date: new Date('2024-03-22'),
       justified: true,  // Justified absence
       justification: null,
     },
-    {
+    { id:8,
       student: students[2],
       course: courses[2],
       date: new Date('2024-03-28'),
@@ -233,8 +239,8 @@ async function seedAbsences(dataSource: DataSource, students: Student[], courses
       justification: null,
     },
 
-    // Student 1 in another course
-    {
+
+    { id:9,
       student: students[1],
       course: courses[0],
       date: new Date('2024-03-12'),

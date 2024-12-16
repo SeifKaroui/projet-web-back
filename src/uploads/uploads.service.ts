@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { CreateUploadDto } from './dto/create-upload.dto';
 import { UploadsUtils } from './utils/uploads-utils';
 import { existsSync } from 'fs';
+import { unlink } from 'fs/promises';
 
 @Injectable()
 export class UploadsService {
@@ -62,5 +63,16 @@ export class UploadsService {
   ): Promise<Upload> {
     const upload = this.uploadRepository.create(createUploadDto);
     return this.uploadRepository.save(upload);
+  }
+  async deleteUpload(upload: Upload): Promise<void> {
+    try {
+      const filePath = UploadsUtils.getFullFilepath(upload.filename);
+      if (existsSync(filePath)) {
+        await unlink(filePath);
+      }
+      await this.uploadRepository.remove(upload);
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to delete upload');
+    }
   }
 }

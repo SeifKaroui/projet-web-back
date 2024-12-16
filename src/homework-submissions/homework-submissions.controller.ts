@@ -11,6 +11,7 @@ import {
   Param,
   Patch,
   Get,
+  UploadedFiles,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { HomeworkSubmissionsService } from './homework-submissions.service';
@@ -21,6 +22,7 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse } from '@nestjs/swagge
 import { UpdateHomeworkSubmissionDto } from './dto/update-homework-submission.dto';
 import { JwtUser } from 'src/auth/interfaces/jwt-user.interface';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { CustomFilesInterceptor } from 'src/common/interceptors/custom-files.interceptor';
 
 @Controller('homework-submissions')
 @UseGuards(AuthGuard('jwt'))
@@ -37,12 +39,15 @@ export class HomeworkSubmissionsController {
     type: 'multipart/form-data',
     schema: {
       type: 'object',
-      required: ['file', 'homeworkId'],
+      required: ['files', 'homeworkId'], 
       properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-          description: 'The homework file to upload (PDF, DOC, DOCX, PPT, PPTX, TXT)',
+        files: {
+          type: 'array', 
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+          description: 'The homework files to upload (PDF, DOC, DOCX, PPT, PPTX, TXT)',
         },
         homeworkId: {
           type: 'integer',
@@ -52,43 +57,19 @@ export class HomeworkSubmissionsController {
     },
   })
 
-  @UseInterceptors(
-    FileInterceptor('file', {
-      limits: { fileSize: 5 * 1024 * 1024 },
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          cb(null, `${Date.now()}-${file.originalname}`);
-        },
-      }),
-      fileFilter: (req, file, callback) => {
-        const allowedMimes = [
-          'application/pdf', 
-          'application/msword',
-          'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
-          'application/vnd.ms-powerpoint',
-          'application/vnd.openxmlformats-officedocument.presentationml.presentation', 
-          'text/plain'
-        ];
-        if (allowedMimes.includes(file.mimetype)) {
-          callback(null, true);
-        } else {
-          callback(new BadRequestException('Invalid file type. Allowed types: PDF, DOC, DOCX, PPT, PPTX, TXT'), false);
-        }
-      },
-    }),
-  )
+  @UseInterceptors(CustomFilesInterceptor)
   async submitHomework(
     @Body() dto: CreateHomeworkSubmissionDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File[],
     @GetUser() user: JwtUser,
   ) {
 
-
-    if (!file) {
+    
+    if (!files) {
+      
       throw new BadRequestException('No file uploaded');
     }
-    return this.submissionsService.submitHomework(user.id, dto.homeworkId, file.path);
+    return this.submissionsService.submitHomework(user.id, dto.homeworkId, files);
   }
   
   @Delete(':id')

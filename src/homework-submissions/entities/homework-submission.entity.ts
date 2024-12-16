@@ -4,12 +4,18 @@ import {
     Column,
     ManyToOne,
     CreateDateColumn,
+    OneToOne,
+    JoinColumn,
+    OneToMany,
   } from 'typeorm';
   import { Homework } from '../../homework/entities/homework.entity';
   import { Student } from '../../users/entities/user.entity';
+  import { Upload } from '../../uploads/entities/upload.entity';
+  import { TimeStampEntity } from 'src/common/db/timestamp.entity';
+
   
   @Entity()
-  export class HomeworkSubmission {
+  export class HomeworkSubmission extends TimeStampEntity {
     @PrimaryGeneratedColumn()
     id: number;
   
@@ -28,6 +34,9 @@ import {
     @Column({ type: 'text', nullable: true })
     feedback: string;
 
-    @Column({ type: 'text' })
-    fileUrl: string; 
+    @OneToMany(() => Upload, (upload) => upload.submission)
+    uploads: Upload[];
   }
+    
+    
+  

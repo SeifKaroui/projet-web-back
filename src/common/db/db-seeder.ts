@@ -144,14 +144,12 @@ async function seedHomework(dataSource: DataSource, courses: Course[], teachers:
       title: 'Homework 1',
       description: 'Create a simple JavaScript application',
       deadline: new Date('2025-03-15'),
-      teacher: teachers[0],
       course: courses[0],
     },
     { id:2,
       title: 'Homework 2',
       description: 'Build a REST API using Express.js',
       deadline: new Date('2026-03-20'),
-      teacher: teachers[1],
       course: courses[1],
     },
     { id:3,
@@ -166,7 +164,6 @@ async function seedHomework(dataSource: DataSource, courses: Course[], teachers:
       title: 'Homework 4',
       description: 'Create unit tests for your API',
       deadline: new Date('2027-04-01'),
-      teacher: teachers[1],
       course: courses[1],
     }
   ]);

@@ -139,6 +139,7 @@ async function seedHomework(dataSource: DataSource, courses: Course[], teachers:
   const homeworkRepository = dataSource.getRepository(Homework);
 
   await homeworkRepository.save([
+
     { id:1,
       title: 'Homework 1',
       description: 'Create a simple JavaScript application',
@@ -154,12 +155,13 @@ async function seedHomework(dataSource: DataSource, courses: Course[], teachers:
       course: courses[1],
     },
     { id:3,
+
       title: 'Homework 3',
       description: 'Design and implement a database schema',
       deadline: new Date('2024-03-25'),
-      teacher: teachers[0],
       course: courses[2],
     },
+
     { id:4,
       title: 'Homework 4',
       description: 'Create unit tests for your API',

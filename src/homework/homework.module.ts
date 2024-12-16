@@ -3,9 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HomeworkController } from './homework.controller';
 import { HomeworkService } from './homework.service';
 import { Homework } from './entities/homework.entity';
+import { UploadsModule } from 'src/uploads/uploads.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Homework])],
+  imports: [UploadsModule,TypeOrmModule.forFeature([Homework])],
   controllers: [HomeworkController],
   providers: [HomeworkService]
 })

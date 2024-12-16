@@ -120,14 +120,14 @@ export class HomeworkSubmissionsService {
   async gradeSubmission(submissionId: number, teacherId: string, updateDto: UpdateHomeworkSubmissionDto) {
     const submission = await this.submissionsRepository.findOne({
       where: { id: submissionId },
-      relations: ['homework', 'homework.teacher', 'homework.course', 'uploads'],
+      relations: ['homework', 'homework.course',  'homework.course.teacher','uploads'],
     });
 
     if (!submission) {
       throw new NotFoundException('Submission not found');
     }
 
-    if (submission.homework.teacher.id !== teacherId) {
+    if (submission.homework.course.teacher.id !== teacherId) {
       throw new UnauthorizedException('You are not authorized to grade this submission');
     }
 
@@ -141,14 +141,14 @@ export class HomeworkSubmissionsService {
   async getStudentsSubmissionStatus(homeworkId: number, teacherId: string) {
     const homework = await this.homeworkRepository.findOne({
       where: { id: homeworkId },
-      relations: ['teacher', 'course', 'submissions', 'submissions.student', 'submissions.uploads'],
+      relations: ['course', 'submissions', 'submissions.student', 'submissions.uploads','course.teacher'],
     });
 
     if (!homework) {
       throw new NotFoundException('Homework not found');
     }
 
-    if (homework.teacher.id !== teacherId) {
+    if (homework.course.teacher.id !== teacherId) {
       throw new UnauthorizedException('You are not authorized to view submissions for this homework');
     }
 

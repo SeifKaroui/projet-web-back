@@ -1,5 +1,6 @@
 import { TimeStampEntity } from 'src/common/db/timestamp.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { HomeworkSubmission } from 'src/homework-submissions/entities/homework-submission.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('uploads')
 export class Upload extends TimeStampEntity {
@@ -17,4 +18,7 @@ export class Upload extends TimeStampEntity {
 
   @Column()
   mimetype: string;
+  
+  @ManyToOne(() => HomeworkSubmission, (submission) => submission.uploads)
+submission: HomeworkSubmission;
 }

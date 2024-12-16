@@ -6,6 +6,7 @@ import {
     CreateDateColumn,
     OneToOne,
     JoinColumn,
+    OneToMany,
   } from 'typeorm';
   import { Homework } from '../../homework/entities/homework.entity';
   import { Student } from '../../users/entities/user.entity';
@@ -33,7 +34,9 @@ import {
     @Column({ type: 'text', nullable: true })
     feedback: string;
 
-    @OneToOne(() => Upload, { nullable: false, cascade: true })
-    @JoinColumn()
-    upload: Upload;
+    @OneToMany(() => Upload, (upload) => upload.submission)
+    uploads: Upload[];
   }
+    
+    
+  

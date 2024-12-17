@@ -59,10 +59,10 @@ async findAll() {
     return this.coursesService.getCourseStudents(courseId, teacher);
   }
 
-    //return the students of a course by invitation with the course id
-   @Post(':id/join')
+    
+  /* @Post(':id/join')
    @ApiBearerAuth()
-/*async joinByInvitation(
+async joinByInvitation(
   @Param('id', ParseIntPipe) courseId: number,
   @GetUser() student: Student
 ) {

@@ -49,15 +49,16 @@ async findAll() {
     return this.coursesService.joinCourseByCode(joinCourseDto.code, student);
   }
 
-    @UseGuards(JwtAuthGuard, TeacherGuard)
-    @Get(':id/students')
-    @ApiBearerAuth()
-    async getCourseStudents(
-      @Param('id', ParseIntPipe) courseId: number,
-      @GetUser() teacher: Teacher
-    ) {
-      return this.coursesService.getCourseStudents(courseId);
-    }
+  @UseGuards(JwtAuthGuard, TeacherGuard)
+  @Get(':id/students')
+  @ApiBearerAuth()
+  async getCourseStudents(
+    @Param('id', ParseIntPipe) courseId: number,
+    @GetUser() teacher: Teacher
+  ) {
+    return this.coursesService.getCourseStudents(courseId, teacher);
+  }
+
     //return the students of a course by invitation with the course id
    @Post(':id/join')
    @ApiBearerAuth()

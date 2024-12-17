@@ -18,6 +18,7 @@ import { Post } from 'src/posts/entities/post.entity';
 import { UserType } from '../enums/user-type.enum';
 import { TimeStampEntity } from 'src/common/db/timestamp.entity';
 import { Exclude } from 'class-transformer';
+import { ApiHideProperty } from '@nestjs/swagger';
 
 @Entity('users')
 @TableInheritance({ column: { type: 'varchar', name: 'type' } })
@@ -41,12 +42,15 @@ export class User extends TimeStampEntity {
   @Column({ type: 'enum', enum: UserType })
   type: UserType;
 
+  @ApiHideProperty()
   @OneToMany(() => Comment, (comment) => comment.author)
   comments: Comment[];
 
+  @ApiHideProperty()
   @OneToMany(() => Message, (message) => message.sender)
   sentMessages: Message[];
 
+  @ApiHideProperty()
   @OneToMany(() => Message, (message) => message.receiver)
   receivedMessages: Message[];
 }

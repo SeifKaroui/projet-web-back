@@ -29,7 +29,7 @@ export class CoursesService extends CrudService<Course> {
     // Define the repository  for use in methods
     public Courserepository: Repository<Course>,
     // Inject the MailerService
-    private readonly mailerService: MailerService,
+    //private readonly mailerService: MailerService,
   ) {
     // Call the base class constructor with the repository
     super(Courserepository);
@@ -105,7 +105,7 @@ export class CoursesService extends CrudService<Course> {
    * @param emails - Array of email addresses
    * @param courseCode - The course code to include in the invitation
    */
-  private async sendInvitationEmails(emails: string[], courseCode: string): Promise<void> {
+  /*private async sendInvitationEmails(emails: string[], courseCode: string): Promise<void> {
     // Message content for the invitation
     const message = `You've been invited to join a course. Use this code to join: ${courseCode}`;
     // Loop through the list of emails
@@ -118,7 +118,7 @@ export class CoursesService extends CrudService<Course> {
       });
     }
   }
-
+*/
   /**
    * Create a new course and handle invitations based on the invitation type
    * @param createCourseDto - Data Transfer Object containing course details
@@ -145,7 +145,10 @@ export class CoursesService extends CrudService<Course> {
     if (createCourseDto.invitationType === InvitationType.CODE) {
       // If invitation is by code, return the course code
       return { courseCode };
-    } else if (createCourseDto.invitationType === InvitationType.EMAIL) {
+    }
+    else {
+      throw new ConflictException('Invalid invitation type');
+    } /*else if (createCourseDto.invitationType === InvitationType.EMAIL) {
       // If invitation is by email, ensure emails are provided
       if (!createCourseDto.studentEmails || createCourseDto.studentEmails.length === 0) {
         throw new ConflictException('Student emails are required for email invitations');
@@ -157,7 +160,7 @@ export class CoursesService extends CrudService<Course> {
     } else {
       // If invitation type is invalid, throw an exception
       throw new ConflictException('Invalid invitation type');
-    }
+    }*/
   }
 
   /**
@@ -212,8 +215,7 @@ export class CoursesService extends CrudService<Course> {
    * @param student - The student joining the course
    * @returns A success message
    */
-  async joinCourseByCode(code: string, student?: Student): Promise<{ message: string }> {
-    // Find the course by course code and ensure it's not deleted
+  async joinCourseByCode(code: string, student: Student): Promise<{ message: string }> {
     const course = await this.Courserepository.findOne({
       where: {
         courseCode: code,
@@ -221,24 +223,26 @@ export class CoursesService extends CrudService<Course> {
       },
       relations: ['students'],
     });
-    // If the course is not found, throw a NotFoundException
+  
     if (!course) {
       throw new NotFoundException('Course not found');
     }
+  
     // Ensure the students array is initialized
     if (!course.students) {
       course.students = [];
     }
+  
     // Check if the student is already enrolled
-    if (student && course.students.some(s => s.id === student.id)) {
+    if (course.students.some(s => s.id === student.id)) {
       throw new ConflictException('Already enrolled');
     }
+  
     // Add the student to the course
-    if (student) {
-      course.students.push(student);
-      // Save the updated course entity
-      await this.Courserepository.save(course);
-    }
+    course.students.push(student);
+    // Save the updated course entity
+    await this.Courserepository.save(course);
+  
     // Return a success message
     return { message: 'Successfully joined' };
   }
@@ -297,7 +301,7 @@ export class CoursesService extends CrudService<Course> {
    * @param student - The student joining the course
    * @returns A success message
    */
-  async joinCourseByInvitation(courseId: number, student?: Student): Promise<{ message: string }> {
+ /* async joinCourseByInvitation(courseId: number, student?: Student): Promise<{ message: string }> {
     // Find the course by ID and ensure it's not deleted
     const course = await this.Courserepository.findOne({
       where: {
@@ -326,7 +330,7 @@ export class CoursesService extends CrudService<Course> {
     }
     // Return a success message
     return { message: 'Successfully joined' };
-  }
+  }*/
   async findStudentCourses(student: Student): Promise<Course[]> {
     const courses = await this.Courserepository
       .createQueryBuilder('course')

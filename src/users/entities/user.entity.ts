@@ -15,9 +15,9 @@ import { Absence } from 'src/absences/entities/absence.entity';
 import { HomeworkSubmission } from 'src/homework-submissions/entities/homework-submission.entity';
 import { Result } from 'src/results/entities/result.entity';
 import { Post } from 'src/posts/entities/post.entity';
-import { Homework } from 'src/homework/entities/homework.entity';
 import { UserType } from '../enums/user-type.enum';
 import { TimeStampEntity } from 'src/common/db/timestamp.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('users')
 @TableInheritance({ column: { type: 'varchar', name: 'type' } })
@@ -34,6 +34,7 @@ export class User extends TimeStampEntity {
   @Column({ unique: true })
   email: string;
 
+  @Exclude()
   @Column()
   password: string;
 
@@ -73,7 +74,5 @@ export class Teacher extends User {
 
   @OneToMany(() => Post, (post) => post.author)
   posts: Post[];
-
-
 }
- 
+

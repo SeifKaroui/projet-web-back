@@ -1,9 +1,11 @@
 import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional } from 'class-validator';
 import { Upload } from 'src/uploads/entities/upload.entity';
+import { Unique } from 'typeorm';
 
 export class CreateHomeworkDTO {
   @IsNotEmpty()
   @IsString()
+  @Unique(["title"])
   title: string;
 
   @IsNotEmpty()
@@ -23,8 +25,6 @@ export class CreateHomeworkDTO {
 }
 
 export class UpdateHomeworkDTO {
-  @IsNumber()
-  homeworkId: number;
 
   @IsNotEmpty()
   @IsString()
@@ -38,9 +38,6 @@ export class UpdateHomeworkDTO {
   @IsDateString()
   deadline?: string;
 
-  @IsOptional()
-  @IsNumber()
-  courseId?: number;
   
 }
 
@@ -50,17 +47,5 @@ export class HomeworkResponseDTO {
   description: string;
   deadline: Date;
   createdAt: Date;
-  course: {
-    id: number;
-    title: string;
-  };
-  submissions: {
-    id: number;
-    student: {
-      id: number;
-      name: string;
-    };
-    submittedAt: Date;
-    grade?: number;
-  }[];
+  files: Upload[];
 }

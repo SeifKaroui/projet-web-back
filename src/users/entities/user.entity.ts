@@ -73,7 +73,8 @@ export class Teacher extends User {
 
   @OneToMany(() => Post, (post) => post.author)
   posts: Post[];
-
+  @OneToMany(() => Homework, (homework) => homework.teacher)
+  homeworks: Homework[];
 
 }
  

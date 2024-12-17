@@ -10,7 +10,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     TypeOrmModule.forFeature([Course]),
     MailerModule,
   ],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, CoursesService],
   controllers: [CoursesController],
   providers: [CoursesService],
 })

@@ -74,11 +74,10 @@ export class HomeworkSubmissionsController {
   
   @Delete(':Homeworkid')
   async deleteSubmission(
-  @Param('id') homeworkId: number,
+  @Param('Homeworkid') HomeworkId: number,
   @GetUser() user: JwtUser,
 ) {
-
-  return this.submissionsService.deleteSubmission(homeworkId, user.id);
+  return this.submissionsService.deleteSubmission(HomeworkId, user.id);
 }
 
 @Patch(':subid/grade')

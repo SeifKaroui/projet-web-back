@@ -82,7 +82,7 @@ export class HomeworkSubmissionsController {
 
 @Patch(':subid/grade')
 async gradeSubmission(
-  @Param('id') submissionId: number,
+  @Param('subid') submissionId: number,
   @Body() updateDto: UpdateHomeworkSubmissionDto,
   @GetUser() user: JwtUser,
 ) {

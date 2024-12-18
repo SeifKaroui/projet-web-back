@@ -30,7 +30,7 @@ export class Course implements HasId {
   courseCode: string;
   @DeleteDateColumn()
   deletedAt: Date;
-  @ManyToOne(() => Teacher, (teacher) => teacher.courses)
+  @ManyToOne(() => Teacher, (teacher) => teacher.courses,{eager: true})
   @JoinColumn({ name: 'teacherId' })
   teacher: Teacher;
 

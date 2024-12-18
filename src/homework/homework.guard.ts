@@ -5,9 +5,8 @@ import { Homework } from "./entities/homework.entity";
 export class TeacherGuard implements CanActivate {
     constructor() { }
     canActivate(context: ExecutionContext): boolean {
-        Logger.log('TeacherGuard');
+        
         const request = context.switchToHttp().getRequest();
-        const  homework:Partial<Homework> = request.body
         const user = request.user;
         if (user['type'] == "teacher" ) {
             return true;

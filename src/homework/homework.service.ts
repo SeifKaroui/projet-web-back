@@ -1,4 +1,4 @@
-import {  Inject, Injectable, Logger, Req } from '@nestjs/common';
+import {  ForbiddenException, Inject, Injectable, Logger, NotFoundException, Req } from '@nestjs/common';
 import { CrudService } from 'src/common/generics/crud.service';
 import { Homework } from './entities/homework.entity';
 import { DeepPartial, Repository, UpdateResult } from 'typeorm';
@@ -25,8 +25,8 @@ export class HomeworkService extends CrudService<Homework> {
     }
     async create_hw(teacher:Teacher,addDto: DeepPartial<Homework>,files:Express.Multer.File[]): Promise<Homework> {
         const course=await this.coursesService.findOne(addDto["courseId"]);
-        if (course['teacherId'] != teacher['id']){
-            throw new Error('You are not the teacher of this course');
+        if (course['teacher']["id"].localeCompare( teacher['id'])!=0){
+            throw new ForbiddenException('You are not the teacher of this course');
         }
         if (files == undefined){
             return super.create({...addDto,teacher:teacher});
@@ -37,11 +37,11 @@ export class HomeworkService extends CrudService<Homework> {
     //need to be checked
     async update_hw(id: ID, teacher: User, updateDto: DeepPartial<Homework>,files:Express.Multer.File[]): Promise<Homework> {
          const inDb= await this.findOne_(teacher,id);
-        if (!inDb){
-            throw new Error('You are not the teacher of this course');
+         if (!inDb){
+            throw new ForbiddenException('You are not the teacher of this course');
         }
         if (inDb == undefined){
-            Logger.log('Homework not found');
+            throw new NotFoundException('Homework not found');
             
         }
         if (files == undefined){
@@ -54,7 +54,7 @@ export class HomeworkService extends CrudService<Homework> {
     async delete_hw(id: ID, teacher: User): Promise<UpdateResult> {
         const inDb= await this.findOne_(teacher,id);
         if (!inDb){
-            throw new Error('You are not the teacher of this course');
+            throw new ForbiddenException('You are not the teacher of this course');
         }
         return super.softDelete(id);
     }
@@ -68,6 +68,7 @@ export class HomeworkService extends CrudService<Homework> {
     }
     findAll_student(StudentId: string,courseId?: number): Promise<Homework[]> {
         const qb = this.homeworkRepository.createQueryBuilder('h');
+        qb.leftJoinAndSelect('h.files','f');
         qb.leftJoin('h.course','c');
         qb.leftJoin('c.students','s');
         qb.andWhere('s.id = :StudentId',{StudentId});
@@ -79,6 +80,7 @@ export class HomeworkService extends CrudService<Homework> {
     }
     findAll_teacher(teacherId: string,courseId?:number): Promise<Homework[]> {
         const qb = this.homeworkRepository.createQueryBuilder('h');
+        qb.leftJoinAndSelect('h.files','f');
         qb.andWhere("h.teacherId = :teacherId", { teacherId });
         qb.andWhere("h.deleted_at IS NULL");
         if (courseId){
@@ -95,22 +97,22 @@ export class HomeworkService extends CrudService<Homework> {
     }
     findOne_student(StudentId: string, id: ID): Promise<Homework> {
         const qb = this.homeworkRepository.createQueryBuilder('h');
+        qb.leftJoinAndSelect('h.files','f');
         qb.leftJoin('h.course','c');
         qb.leftJoin('c.students','s');
         qb.andWhere('s.id = :StudentId',{StudentId});
         qb.andWhere('h.id = :id',{id});
         qb.andWhere("h.deleted_at IS NULL");
         
-        Logger.log(qb.getQuery());
-
         return qb.getOne();
 
     }
     findOne_teacher(teacherId: string, id: ID): Promise<Homework> {
         const qb=this.homeworkRepository.createQueryBuilder('h');
-        qb.andWhere("teacherId = :teacherId", { teacherId });
-        qb.andWhere("id = :id", { id });
-        qb.andWhere("deleted_at IS NULL");
+        qb.leftJoinAndSelect('h.files','f');
+        qb.andWhere("h.teacherId = :teacherId", { teacherId });
+        qb.andWhere("h.id = :id", { id });
+        qb.andWhere("h.deleted_at IS NULL");
         return qb.getOne();
     }
 }

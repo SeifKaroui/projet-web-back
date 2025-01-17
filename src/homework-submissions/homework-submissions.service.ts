@@ -60,7 +60,7 @@ export class HomeworkSubmissionsService {
         throw new NotFoundException('Student not found');
       }
 
-      const isEnrolled = student.courses.some(course => course.id === homework.course.id);
+      const isEnrolled = student.enrolled_courses.some(course => course.id === homework.course.id);
       if (!isEnrolled) {
 
         throw new ForbiddenException('You are not enrolled in this course');

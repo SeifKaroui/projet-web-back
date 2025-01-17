@@ -77,7 +77,6 @@ import { UploadsModule } from './uploads/uploads.module';
       useClass: AccessTokenGuard,
     },
   ],
-  
 })
 export class AppModule implements OnModuleInit {
   constructor(private dataSource: DataSource) {}

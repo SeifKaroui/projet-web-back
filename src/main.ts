@@ -7,7 +7,12 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['log', 'warn', 'error', 'debug', 'verbose'], // Add more log levels
   });
-
+  app.enableCors({
+    origin: true, // Allow all origins in development
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    allowedHeaders: 'Content-Type, Accept, Authorization',
+  });
   const config = new DocumentBuilder()
     .setTitle('Projet Web Api example')
     .setDescription('The Projet Web API description')

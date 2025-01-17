@@ -150,7 +150,7 @@ async function seedCourses(
       type: 'lecture',
       startDate: new Date('2024-03-01'),
       endDate: new Date('2024-06-30'),
-      teacher: teachers[3],
+      teacher: teachers[0],
       students: [students[0], students[1]],
     },
     {
@@ -210,7 +210,6 @@ async function seedHomework(
       deadline: new Date('2024-03-25'),
       course: courses[2],
       teacher: teachers[0],
-
     },
 
     {
@@ -220,8 +219,7 @@ async function seedHomework(
       deadline: new Date('2027-04-01'),
       course: courses[1],
       teacher: teachers[1],
-    }
-
+    },
   ]);
   return teachers;
 }

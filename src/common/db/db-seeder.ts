@@ -192,6 +192,7 @@ async function seedHomework(
       description: 'Create a simple JavaScript application',
       deadline: new Date('2025-03-15'),
       course: courses[0],
+      teacher: teachers[0],
     },
     {
       id: 2,
@@ -199,6 +200,7 @@ async function seedHomework(
       description: 'Build a REST API using Express.js',
       deadline: new Date('2026-03-20'),
       course: courses[1],
+      teacher: teachers[1],
     },
     {
       id: 3,
@@ -207,6 +209,8 @@ async function seedHomework(
       description: 'Design and implement a database schema',
       deadline: new Date('2024-03-25'),
       course: courses[2],
+      teacher: teachers[0],
+
     },
 
     {
@@ -215,8 +219,11 @@ async function seedHomework(
       description: 'Create unit tests for your API',
       deadline: new Date('2027-04-01'),
       course: courses[1],
-    },
+      teacher: teachers[1],
+    }
+
   ]);
+  return teachers;
 }
 
 async function seedAbsences(

@@ -75,4 +75,9 @@ export class Student extends User {
 export class Teacher extends User {
   @OneToMany(() => Course, (course) => course.teacher)
   courses: Course[];
+
+  @OneToMany(() => Post, (post) => post.author)
+  posts: Post[];
+  @OneToMany(() => Homework, (homework) => homework.teacher)
+  homeworks: Homework[];
 }

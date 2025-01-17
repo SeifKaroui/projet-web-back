@@ -1,5 +1,13 @@
-
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany, OneToMany, JoinColumn, JoinTable } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  ManyToMany,
+  OneToMany,
+  JoinColumn,
+  JoinTable,
+} from 'typeorm';
 import { Teacher } from '../../users/entities/user.entity';
 import { Student } from '../../users/entities/user.entity';
 import { Absence } from '../../absences/entities/absence.entity';
@@ -25,7 +33,6 @@ export class Course implements HasId {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   startDate: Date;
 
-
   @Column({ unique: true, nullable: true })
   courseCode: string;
   @DeleteDateColumn()
@@ -34,8 +41,7 @@ export class Course implements HasId {
   @JoinColumn({ name: 'teacherId' })
   teacher: Teacher;
 
-  @ManyToMany(() => Student, (student) => student.courses)
-
+  @ManyToMany(() => Student, (student) => student.enrolled_courses)
   students: Student[];
 
   @OneToMany(() => Absence, (absence) => absence.course)
@@ -48,7 +54,5 @@ export class Course implements HasId {
   homeworks: Homework[];
   @OneToMany(() => Result, (result) => result.course)
   results: Result[];
-  
-  
-
 }
+

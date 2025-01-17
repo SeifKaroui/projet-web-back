@@ -58,8 +58,8 @@ export class User extends TimeStampEntity {
 @ChildEntity(UserType.Student)
 export class Student extends User {
   @ManyToMany(() => Course, (course) => course.students)
-  @JoinTable()
-  courses: Course[];
+  @JoinTable({name:'user_enrolled_courses'})
+  enrolled_courses: Course[];
 
   @OneToMany(() => Absence, (absence) => absence.student)
   absences: Absence[];
@@ -75,8 +75,4 @@ export class Student extends User {
 export class Teacher extends User {
   @OneToMany(() => Course, (course) => course.teacher)
   courses: Course[];
-
-  @OneToMany(() => Post, (post) => post.author)
-  posts: Post[];
 }
-

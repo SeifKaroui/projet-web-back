@@ -19,6 +19,7 @@ import { UserType } from '../enums/user-type.enum';
 import { TimeStampEntity } from 'src/common/db/timestamp.entity';
 import { Exclude } from 'class-transformer';
 import { ApiHideProperty } from '@nestjs/swagger';
+import { Homework } from 'src/homework/entities/homework.entity';
 
 @Entity('users')
 @TableInheritance({ column: { type: 'varchar', name: 'type' } })
@@ -58,7 +59,7 @@ export class User extends TimeStampEntity {
 @ChildEntity(UserType.Student)
 export class Student extends User {
   @ManyToMany(() => Course, (course) => course.students)
-  @JoinTable({name:'user_enrolled_courses'})
+  @JoinTable({ name: 'user_enrolled_courses' })
   enrolled_courses: Course[];
 
   @OneToMany(() => Absence, (absence) => absence.student)
@@ -76,8 +77,6 @@ export class Teacher extends User {
   @OneToMany(() => Course, (course) => course.teacher)
   courses: Course[];
 
-  @OneToMany(() => Post, (post) => post.author)
-  posts: Post[];
   @OneToMany(() => Homework, (homework) => homework.teacher)
   homeworks: Homework[];
 }

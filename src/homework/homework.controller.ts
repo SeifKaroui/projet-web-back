@@ -3,10 +3,12 @@ import { Homework } from './entities/homework.entity';
 import { HomeworkService } from './homework.service';
 import { UpdateResult } from 'typeorm';
 import { TeacherGuard } from './homework.guard';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { CreateHomeworkDTO, UpdateHomeworkDTO } from './dto/homework.dto';
 import { CustomFilesInterceptor } from 'src/common/interceptors/custom-files.interceptor';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import { Course } from 'src/courses/entities/course.entity';
+import { title } from 'process';
 
 @ApiBearerAuth()
 @Controller('homework')
@@ -53,6 +55,42 @@ export class HomeworkController {
         return this.homeworkService.findOne_(user,id);
     }
     @Post()
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        description: 'Homework  creation',
+        type: 'multipart/form-data',
+        schema: {
+          type: 'object',
+          required: ['files', 'title','deadline','description','courseId'], 
+          properties: {
+            courseId: {
+                type: 'integer',
+                description: 'ID of the course being added to',
+              },
+              title: {
+                type: 'string',
+                description: 'title of the homework',
+              },
+              description: {
+                type: 'string',
+                description: 'description of the homework',
+              },
+              deadline: {
+                type: 'string',
+                description: 'title of the homework',
+              },
+            files: {
+              type: 'array', 
+              items: {
+                type: 'string',
+                format: 'binary',
+              },
+              description: 'The homework files to upload (PDF, DOC, DOCX, PPT, PPTX, TXT...)',
+            },
+            
+          },
+        },
+      })
     @UseGuards(TeacherGuard)
     @UseInterceptors(CustomFilesInterceptor)
     createHomework(
@@ -73,7 +111,7 @@ export class HomeworkController {
         @UploadedFiles() files: Express.Multer.File[]
 
     ): Promise<Homework|HttpException> {
-        return this.homeworkService.update_hw(id, user["id"], updateHomeworkDTO,files);
+        return this.homeworkService.update_hw(id, user, updateHomeworkDTO,files);
     }
     @Patch("delete/:id")
     @UseGuards(TeacherGuard)

@@ -35,6 +35,6 @@ export class Homework extends TimeStampEntity {
   @OneToMany(() => HomeworkSubmission, (submission) => submission.homework)
   submissions: HomeworkSubmission[];
 
-  @OneToMany(()=> Upload,"" )
+  @OneToMany(()=> Upload, (upload) => upload.homework,{eager: true})
   files: Upload[];
 }

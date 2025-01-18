@@ -47,9 +47,6 @@ export class PostsController {
     @Body() createUserDto: CreatePostDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ): Promise<Post> {
-    console.log('files:');
-    console.log(files);
-    // return 'eee';
     return this.postsService.createPost(
       user.id,
       courseId,

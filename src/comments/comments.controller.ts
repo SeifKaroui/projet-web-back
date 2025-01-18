@@ -3,7 +3,9 @@ import { CommentService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { JwtUser } from 'src/auth/interfaces/jwt-user.interface';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('courses/posts')
 export class CommentController {
     constructor(private readonly commentService: CommentService) { }
@@ -20,10 +22,13 @@ export class CommentController {
         return this.commentService.findAllByPost(postId);
     }
 
-    // Delete a comment
-    @Delete(':id')
-    async deleteComment(@Param('id') id: number) {
-        await this.commentService.softDelete(id);
-        return { message: 'Comment deleted successfully' };
-    }
+   // Dans le contrôleur
+   @Delete(':postId/comments/:id') // Nouvelle route
+   async deleteComment(
+       @Param('postId', ParseIntPipe) postId: number, // ID du post
+       @Param('id', ParseIntPipe) id: number, // ID du commentaire
+   ) {
+       await this.commentService.deleteComment(id);
+       return { message: 'Comment deleted successfully' };
+   }
 }

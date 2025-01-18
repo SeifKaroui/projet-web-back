@@ -23,4 +23,7 @@ export class Comment extends TimeStampEntity {
 
   @ManyToOne(() => Post, (post) => post.comments)
   post: Post;
+
+  @DeleteDateColumn() // Colonne pour le soft delete
+  deletedAt: Date;
 }

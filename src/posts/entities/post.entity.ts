@@ -24,7 +24,7 @@ export class Post extends TimeStampEntity {
   course: Course;
 
   @OneToMany(() => Upload, (upload) => upload.post)
-  attachements: Upload[];
+  attachments: Upload[];
 
   @Exclude()
   @OneToMany(() => Comment, (comment) => comment.post)

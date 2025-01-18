@@ -1,5 +1,6 @@
 import {
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -12,6 +13,7 @@ import { Course } from 'src/courses/entities/course.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { JwtUser } from 'src/auth/interfaces/jwt-user.interface';
 import { UserType } from 'src/users/enums/user-type.enum';
+import { UploadsService } from 'src/uploads/uploads.service';
 
 @Injectable()
 export class PostsService extends CrudService<Post> {
@@ -24,6 +26,8 @@ export class PostsService extends CrudService<Post> {
 
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+
+    private uploadsService: UploadsService,
   ) {
     super(postsRepository);
   }
@@ -89,14 +93,19 @@ export class PostsService extends CrudService<Post> {
     userId: string,
     courseId: number,
     createPostDto: CreatePostDto,
+    files: Array<Express.Multer.File>,
   ): Promise<Post> {
     const canCreatePost: boolean = await this.canCreatePost(userId, courseId);
     if (!canCreatePost) {
       throw new UnauthorizedException(`Cannot create a post in this course.`);
     }
+
+    const attachments = await this.uploadsService.saveFiles(files);
+
     const post = this.postsRepository.create({
       ...createPostDto,
       course: { id: courseId },
+      attachments,
     });
 
     return this.postsRepository.save(post);

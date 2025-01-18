@@ -6,13 +6,16 @@ import {
   Param,
   Post as PostMethod,
   ParseIntPipe,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Post } from './entities/post.entity';
 import { JwtUser } from 'src/auth/interfaces/jwt-user.interface';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { CustomFilesInterceptor } from 'src/common/interceptors/custom-files.interceptor';
 
 @ApiBearerAuth()
 @Controller('courses')
@@ -36,12 +39,23 @@ export class PostsController {
   }
 
   @PostMethod('/:courseId/posts')
+  @UseInterceptors(CustomFilesInterceptor)
+  @ApiConsumes('multipart/form-data')
   createPostInCourse(
     @GetUser() user: JwtUser,
     @Param('courseId', ParseIntPipe) courseId: number,
     @Body() createUserDto: CreatePostDto,
+    @UploadedFiles() files: Array<Express.Multer.File>,
   ): Promise<Post> {
-    return this.postsService.createPost(user.id, courseId, createUserDto);
+    console.log('files:');
+    console.log(files);
+    // return 'eee';
+    return this.postsService.createPost(
+      user.id,
+      courseId,
+      createUserDto,
+      files,
+    );
   }
 
   @Delete('/posts/:postId')

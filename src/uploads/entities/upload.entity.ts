@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { TimeStampEntity } from 'src/common/db/timestamp.entity';
 import { HomeworkSubmission } from 'src/homework-submissions/entities/homework-submission.entity';
 import { Homework } from 'src/homework/entities/homework.entity';
@@ -12,6 +13,7 @@ export class Upload extends TimeStampEntity {
   @Column()
   originalname: string;
 
+  @Exclude()
   @Column()
   filename: string;
 
@@ -27,5 +29,5 @@ export class Upload extends TimeStampEntity {
   @ManyToOne(() => Post, (post) => post.attachments)
   post: Post;
   @ManyToOne(() => Homework, (homework) => homework.files)
-homework: Homework;
+  homework: Homework;
 }

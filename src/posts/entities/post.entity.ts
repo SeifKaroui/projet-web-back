@@ -9,7 +9,7 @@ import { Course } from '../../courses/entities/course.entity';
 import { Comment } from '../../comments/entities/comment.entity';
 import { TimeStampEntity } from 'src/common/db/timestamp.entity';
 import { Upload } from 'src/uploads/entities/upload.entity';
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 
 @Entity('posts')
 export class Post extends TimeStampEntity {
@@ -23,7 +23,8 @@ export class Post extends TimeStampEntity {
   @ManyToOne(() => Course, (course) => course.posts)
   course: Course;
 
-  @OneToMany(() => Upload, (upload) => upload.post)
+  @Expose()
+  @OneToMany(() => Upload, (upload) => upload.post, { eager: true })
   attachments: Upload[];
 
   @Exclude()

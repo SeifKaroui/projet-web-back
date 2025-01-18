@@ -24,7 +24,7 @@ export class Upload extends TimeStampEntity {
   @ManyToOne(() => HomeworkSubmission, (submission) => submission.uploads)
   submission: HomeworkSubmission;
 
-  @ManyToOne(() => Post, (post) => post.attachements)
+  @ManyToOne(() => Post, (post) => post.attachments)
   post: Post;
   @ManyToOne(() => Homework, (homework) => homework.files)
 homework: Homework;

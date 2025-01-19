@@ -35,34 +35,34 @@ export class AbsencesService extends CrudService<Absence> {
     if (!userId || !courseId) {
       throw new BadRequestException('Invalid userId or courseId');
     }
-  
+
     // Rechercher le cours avec les étudiants et l'enseignant associé
     const course = await this.courseRepository.findOne({
       where: { id: courseId },
       relations: ['students', 'teacher'], // Charger la relation 'students' et 'teacher'
     });
-  
+
     // Vérifier si le cours existe
     if (!course) {
       throw new NotFoundException('Course not found');
     }
-  
+
     // Vérifier si l'utilisateur est un étudiant
     const isStudentInCourse = course.students?.some(student => student.id === userId);
-  
+
     if (isStudentInCourse) {
       return true; // L'utilisateur est un étudiant et appartient au cours
     }
-  
+
     // Vérifier si l'utilisateur est un enseignant
     if (course.teacher?.id === userId) {
       return true; // L'enseignant est forcément lié au cours
     }
-  
+
     return false; // L'utilisateur n'appartient ni à ce cours en tant qu'étudiant ni en tant qu'enseignant
   }
 
- 
+
   async createAbsence(createAbsenceDto: CreateAbsenceDto, teacherId: string): Promise<Absence> {
     const { studentId, courseId, date } = createAbsenceDto;
 
@@ -104,26 +104,26 @@ export class AbsencesService extends CrudService<Absence> {
       where: { id: absenceId },
       relations: ['course', 'course.teacher']
     });
-  
+
     if (!absence) {
       throw new NotFoundException('Absence not found');
     }
-  
+
     // Vérifier si l'enseignant est responsable du cours lié à l'absence
     const isTeacherInClass = await this.checkIfUserBelongsToClass(teacherId, absence.course.id);
     if (!isTeacherInClass) {
       throw new ConflictException('Teacher is not associated with this course');
     }
-  
+
     // Soft delete autorisé
     super.softDelete(absenceId);
   }
 
   async justifyAbsence(studentId: string, id: number, updateAbsenceDto: UpdateAbsenceDto): Promise<Absence> {
     const { justification } = updateAbsenceDto;
-    const absence = await this.absenceRepository.findOne({ 
-      where: { id }, 
-      relations: ['course'] 
+    const absence = await this.absenceRepository.findOne({
+      where: { id },
+      relations: ['course']
     });
 
     if (!absence) {
@@ -150,9 +150,9 @@ export class AbsencesService extends CrudService<Absence> {
 
   async validateAbsence(teacherId: string, id: number, validateAbsenceDto: ValidateAbsenceDto): Promise<Absence> {
     const { justified } = validateAbsenceDto;
-    const absence = await this.absenceRepository.findOne({ 
-      where: { id }, 
-      relations: ['course'] 
+    const absence = await this.absenceRepository.findOne({
+      where: { id },
+      relations: ['course']
     });
 
     if (!absence) {
@@ -162,6 +162,7 @@ export class AbsencesService extends CrudService<Absence> {
     // Vérifier que le professeur appartient au cours avant de valider l'absence
     const isUserInClass = await this.checkIfUserBelongsToClass(teacherId, absence.course.id);
     if (!isUserInClass) {
+      
       throw new ConflictException('Teacher is not enrolled in this course');
     }
 
@@ -207,47 +208,47 @@ export class AbsencesService extends CrudService<Absence> {
     getAbsencesByStudentDto: GetAbsencesByStudentDto
   ): Promise<any> {
     // Vérifier l'existence de l'étudiant
-    const student = await this.studentRepository.findOne({ 
-      where: { id: studentId } 
+    const student = await this.studentRepository.findOne({
+      where: { id: studentId }
     });
     if (!student) {
       throw new NotFoundException('Student not found');
     }
-  
+
     // Vérifier l'existence du cours
-    const course = await this.courseRepository.findOne({ 
-      where: { id: getAbsencesByStudentDto.courseId } 
+    const course = await this.courseRepository.findOne({
+      where: { id: getAbsencesByStudentDto.courseId }
     });
     if (!course) {
       throw new NotFoundException('Course not found');
     }
-  
+
     // Vérification de l'appartenance de l'étudiant au cours
     const isUserInClass = await this.checkIfUserBelongsToClass(studentId, course.id);
     if (!isUserInClass) {
       throw new ConflictException('Student is not enrolled in this course');
     }
-  
+
     // Compter les absences justifiées
     const justifiedCount = await this.absenceRepository.count({
-      where: { 
+      where: {
         student: { id: studentId },
         course: { id: course.id },
         justified: true,
-        deletedAt: null 
+        deletedAt: null
       }
     });
-  
+
     // Compter les absences non justifiées
     const nonJustifiedCount = await this.absenceRepository.count({
-      where: { 
+      where: {
         student: { id: studentId },
         course: { id: course.id },
         justified: false,
-        deletedAt: null 
+        deletedAt: null
       }
     });
-  
+
     return {
       justifiedCount,
       nonJustifiedCount,
@@ -260,28 +261,28 @@ export class AbsencesService extends CrudService<Absence> {
     getAbsencesDto: GetAbsencesByTeacherDto
   ): Promise<any> {
     const { courseId } = getAbsencesDto;
-  
+
     // Vérification de l'appartenance avant de continuer
     const isUserInClass = await this.checkIfUserBelongsToClass(teacherId, courseId);
     if (!isUserInClass) {
       throw new ConflictException('Teacher is not associated with this course');
     }
-  
+
     // Préparation des options de recherche
     const findOptions: any = {
-      where: { 
+      where: {
         deletedAt: null,
-        course: { 
+        course: {
           id: courseId,
           teacher: { id: teacherId }
         }
       },
       relations: ['student', 'course']
     };
-  
+
     // Récupération des absences
     const absences = await this.absenceRepository.find(findOptions);
-  
+
     // Regroupement par étudiant
     const groupedByStudent = absences.reduce((acc, absence) => {
       const studentId = absence.student.id;
@@ -291,18 +292,20 @@ export class AbsencesService extends CrudService<Absence> {
           absences: [],
         };
       }
-  
+
       acc[studentId].absences.push({
+        id: absence.id,
         course: absence.course,
         date: absence.date,
         justified: absence.justified,
       });
-  
+
       return acc;
     }, {});
-  
+
     return Object.values(groupedByStudent);
   }
+
   async getAbsenceCountsByCourseAndTeacher(
     teacherId: string,
     getAbsencesByTeacherDto: GetAbsencesByTeacherDto
@@ -310,18 +313,18 @@ export class AbsencesService extends CrudService<Absence> {
     const course = await this.courseRepository.findOne({
       where: { id: getAbsencesByTeacherDto.courseId },
     });
-  
+
     if (!course) {
       throw new NotFoundException('Course not found');
     }
-  
+
     // Vérification de l'appartenance avant de continuer
     const isUserInClass = await this.checkIfUserBelongsToClass(teacherId, getAbsencesByTeacherDto.courseId);
     if (!isUserInClass) {
       throw new ConflictException('Teacher is not associated with this course');
     }
-  
-    // Fetch students with their absence counts
+
+    // Fetch students with their absences and justifications
     const studentsWithAbsences = await this.studentRepository
       .createQueryBuilder('student')
       .leftJoinAndSelect('student.absences', 'absence')
@@ -329,24 +332,80 @@ export class AbsencesService extends CrudService<Absence> {
       .andWhere('absence.deletedAt IS NULL')
       .select([
         'student.firstName',
-        'student.lastName', 
+        'student.lastName',
         'student.email',
+        'absence.justification',
+        'absence.justified',
+        'absence.date',
         'SUM(CASE WHEN absence.justified = true THEN 1 ELSE 0 END) as justifiedCount',
         'SUM(CASE WHEN absence.justified = false THEN 1 ELSE 0 END) as nonJustifiedCount'
       ])
-      .groupBy('student.id')
+      .groupBy('student.id, absence.id')  // Include absence.id to get individual absences
+      .orderBy('absence.date', 'DESC')    // Order by date to get the latest absences first
       .getRawMany();
-  
-    // Transform the raw query result into the desired format
-    return studentsWithAbsences.map(student => ({
-      firstName: student.student_firstName,
-      lastName: student.student_lastName,
-      email: student.student_email,
-      absenceCounts: {
-        justifiedCount: parseInt(student.justifiedCount || '0'),
-        nonJustifiedCount: parseInt(student.nonJustifiedCount || '0'),
-        totalCount: parseInt(student.justifiedCount || '0') + parseInt(student.nonJustifiedCount || '0')
+
+    // Transform and group the raw query results by student
+    const studentMap = new Map();
+
+    studentsWithAbsences.forEach(record => {
+      const studentKey = record.student_email; // Using email as a unique identifier
+
+      if (!studentMap.has(studentKey)) {
+        studentMap.set(studentKey, {
+          firstName: record.student_firstName,
+          lastName: record.student_lastName,
+          email: record.student_email,
+          absenceCounts: {
+            justifiedCount: 0,
+            nonJustifiedCount: 0,
+            totalCount: 0
+          },
+          absences: []
+        });
       }
-    }));
+
+      const student = studentMap.get(studentKey);
+
+      // Only add absence if it exists (not null)
+      if (record.absence_date) {
+        student.absences.push({
+          date: record.absence_date,
+          justified: record.absence_justified,
+          justification: record.absence_justification
+        });
+
+        // Update counts
+        if (record.absence_justified) {
+          student.absenceCounts.justifiedCount++;
+        } else {
+          student.absenceCounts.nonJustifiedCount++;
+        }
+        student.absenceCounts.totalCount++;
+      }
+    });
+
+    return Array.from(studentMap.values());
+  }
+
+  async rejectAbsenceJustification(absenceId: number): Promise<Absence> {
+    // Fetch the absence
+    const absence = await this.absenceRepository.findOne({
+      where: { id: absenceId },
+    });
+  
+    if (!absence) {
+      throw new NotFoundException('Absence not found');
+    }
+  
+    // Check if the absence has already been deleted
+    if (absence.deletedAt) {
+      throw new ConflictException('Cannot reject a deleted absence');
+    }
+  
+    // Set the justification to null
+    absence.justification = null;
+  
+    // Save the updated absence
+    return this.absenceRepository.save(absence);
   }
 }

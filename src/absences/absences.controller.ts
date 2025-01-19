@@ -11,56 +11,57 @@ import { GetAbsencesByStudentDto } from './dto/get-absences-by-student.dto';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { StudentGuard } from './guard/student.guard';
 import { ValidateAbsenceDto } from './dto/validate-absence.dto';
+import { RejectAbsenceJustificationDto } from './dto/reject-absence.dto';
 
 @ApiBearerAuth()
 @Controller('absences')
 export class AbsencesController {
-  constructor(private readonly absencesService: AbsencesService) {}
+  constructor(private readonly absencesService: AbsencesService) { }
 
   // for teacher
   @Post('teacher/')
-  @UseGuards(TeacherGuard) 
+  @UseGuards(TeacherGuard)
   async createAbsence(
     @Body() createAbsenceDto: CreateAbsenceDto,
     @GetUser() user: any,): Promise<Absence> {
-    return this.absencesService.createAbsence(createAbsenceDto,user.id);
+    return this.absencesService.createAbsence(createAbsenceDto, user.id);
   }
 
   // for teacher
   @Patch('teacher/:absenceId/validate')
-  @UseGuards(TeacherGuard) 
+  @UseGuards(TeacherGuard)
   async validate(
-    @Param('absenceId', ParseIntPipe) absenceId: number,  
+    @Param('absenceId', ParseIntPipe) absenceId: number,
     @Body() ValidateAbsenceDto: ValidateAbsenceDto,
     @GetUser() user: any,
   ) {
-    return this.absencesService.validateAbsence(user.id,absenceId, ValidateAbsenceDto);
+    return this.absencesService.validateAbsence(user.id, absenceId, ValidateAbsenceDto);
   }
 
   // for student 
   @Patch('student/:absenceId/justify')
-  @UseGuards(StudentGuard) 
+  @UseGuards(StudentGuard)
   async justifyAbsence(
-    @Param('absenceId', ParseIntPipe) absenceId: number,  
+    @Param('absenceId', ParseIntPipe) absenceId: number,
     @Body() updateAbsenceDto: UpdateAbsenceDto,
     @GetUser() user: any,
   ) {
     console.log('User in justifyAbsence:', user);
-    return this.absencesService.justifyAbsence(user.id,absenceId, updateAbsenceDto);
+    return this.absencesService.justifyAbsence(user.id, absenceId, updateAbsenceDto);
   }
 
   // for teacher
   @Delete('teacher/:absenceId')
-  @UseGuards(TeacherGuard) 
+  @UseGuards(TeacherGuard)
   async deleteAbsence(
     @Param('absenceId', ParseIntPipe) absenceId: number,
     @GetUser() user: any,
   ) {
-    return this.absencesService.deleteAbsence(user.id,absenceId);
+    return this.absencesService.deleteAbsence(user.id, absenceId);
   }
-  
+
   // for student 
-  @UseGuards(StudentGuard) 
+  @UseGuards(StudentGuard)
   @Get('student/absence-course')
   async getAbsencesForCurrentStudent(
     @GetUser() user: any,
@@ -82,7 +83,7 @@ export class AbsencesController {
 
   // for teacher
   @Get('teacher/absence-list')
-  @UseGuards(TeacherGuard) 
+  @UseGuards(TeacherGuard)
   async getAbsencesForClassAndTeacher(
     @Query() GetAbsencesByTeacherDto: GetAbsencesByTeacherDto,
     @GetUser() user: any,
@@ -92,11 +93,19 @@ export class AbsencesController {
 
   // for teacher 
   @Get('teacher/count-absence-list')
-  @UseGuards(TeacherGuard) 
+  @UseGuards(TeacherGuard)
   async getAbsenceCountsByCourseAndTeacher(
     @GetUser() user: any,
     @Query() getAbsencesByTeacherDto: GetAbsencesByTeacherDto,
   ): Promise<any> {
     return this.absencesService.getAbsenceCountsByCourseAndTeacher(user.id, getAbsencesByTeacherDto);
+  }
+
+  @Patch(':absenceId/reject')
+  @UseGuards(TeacherGuard)
+  async rejectAbsenceJustification(
+    @Param('absenceId') absenceId: number,
+  ) {
+    return this.absencesService.rejectAbsenceJustification(absenceId);
   }
 }

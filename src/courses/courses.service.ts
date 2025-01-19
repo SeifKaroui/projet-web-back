@@ -322,25 +322,33 @@ export class CoursesService extends CrudService<Course> {
     // Return a success message
     return { message: 'Successfully joined' };
   }*/
-  async findStudentCourses(student: Student): Promise<Course[]> {
-    const courses = await this.Courserepository
-      .createQueryBuilder('course')
-      .innerJoin('course.students', 'student')
-      .where('student.id = :studentId', { studentId: student.id })
-      .andWhere('course.deletedAt IS NULL')
-      .select([
-        'course.id',
-        'course.title',
-        'course.description',
-        'course.type',
-        'course.startDate',
-        'course.courseCode',
-      ])
-      .orderBy('course.startDate', 'DESC')
-      .getMany();
-  
-    return courses;
-  }
+    async findStudentCourses(student: Student): Promise<Course[]> {
+      const courses = await this.Courserepository
+        .createQueryBuilder('course')
+        .innerJoin('course.students', 'student')
+        .where('student.id = :studentId', { studentId: student.id })
+        .andWhere('course.deletedAt IS NULL')
+        .leftJoinAndSelect('course.teacher', 'teacher') // Jointure avec l'enseignant
+        .select([
+          'course.id',
+          'course.title',
+          'course.description',
+          'course.type',
+          'course.startDate',
+          'course.courseCode',
+          'teacher.createdAt', // Sélectionner createdAt de l'enseignant
+          'teacher.updatedAt', // Sélectionner updatedAt de l'enseignant
+          'teacher.id', // Sélectionner l'ID de l'enseignant
+          'teacher.firstName', // Sélectionner le prénom de l'enseignant
+          'teacher.lastName', // Sélectionner le nom de l'enseignant
+          'teacher.email', // Sélectionner l'email de l'enseignant
+          'teacher.type', // Sélectionner le type de l'enseignant
+        ])
+        .orderBy('course.startDate', 'DESC')
+        .getMany();
+    
+      return courses;
+    }
     /*  const course = await this.Courserepository
       .createQueryBuilder('course')
       .innerJoinAndSelect('course.students', 'student') 

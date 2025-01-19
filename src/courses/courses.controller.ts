@@ -2,7 +2,7 @@ import { Controller, Post, Body, UseGuards, Delete, Param, ParseIntPipe, Get, Qu
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { GetUser } from '../auth/decorators/get-user.decorator';
-import { Student, Teacher } from '../users/entities/user.entity';
+import { Student, Teacher, User } from '../users/entities/user.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { TeacherGuard } from '../auth/guards/teacher.guard';
 import { JoinCourseDto } from './dto/join-course.dto';
@@ -49,14 +49,14 @@ export class CoursesController {
     return this.coursesService.joinCourseByCode(joinCourseDto.code, student);
   }
 
-  @UseGuards(JwtAuthGuard, TeacherGuard)
+  @UseGuards(JwtAuthGuard)
   @Get(':id/students')
   @ApiBearerAuth()
   async getCourseStudents(
     @Param('id', ParseIntPipe) courseId: number,
-    @GetUser() teacher: Teacher
+    @GetUser() user: User // Récupérez l'utilisateur connecté (Teacher ou Student)
   ) {
-    return this.coursesService.getCourseStudents(courseId, teacher);
+    return this.coursesService.getCourseStudents(courseId, user);
   }
 
 

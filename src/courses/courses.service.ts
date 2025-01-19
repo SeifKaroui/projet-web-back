@@ -1,5 +1,5 @@
 // Import necessary modules and decorators from NestJS
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
 // Import InjectRepository to inject TypeORM repositories
 import { InjectRepository } from '@nestjs/typeorm';
 // Import TypeORM modules for repository and query operations
@@ -7,7 +7,7 @@ import { Repository, IsNull } from 'typeorm';
 // Import the Course entity
 import { Course } from './entities/course.entity';
 // Import Student and Teacher entities
-import { Student, Teacher } from 'src/users/entities/user.entity';
+import { Student, Teacher, User } from 'src/users/entities/user.entity';
 // Import MailerService for sending emails
 import { MailerService } from '@nestjs-modules/mailer';
 // Import CreateCourseDto and InvitationType enum for course creation
@@ -26,7 +26,7 @@ export class CoursesService extends CrudService<Course> {
   constructor(
     // Inject the Course repository
     @InjectRepository(Course)
-    // Define the repository  for use in methods
+    // Define the repository for use in methods
     public Courserepository: Repository<Course>,
     // Inject the MailerService
     //private readonly mailerService: MailerService,
@@ -101,25 +101,6 @@ export class CoursesService extends CrudService<Course> {
   }
 
   /**
-   * Send invitation emails to a list of email addresses
-   * @param emails - Array of email addresses
-   * @param courseCode - The course code to include in the invitation
-   */
-  /*private async sendInvitationEmails(emails: string[], courseCode: string): Promise<void> {
-    // Message content for the invitation
-    const message = `You've been invited to join a course. Use this code to join: ${courseCode}`;
-    // Loop through the list of emails
-    for (const email of emails) {
-      // Send an email to each recipient
-      await this.mailerService.sendMail({
-        to: email,
-        subject: 'Course Invitation',
-        text: message,
-      });
-    }
-  }
-*/
-  /**
    * Create a new course and handle invitations based on the invitation type
    * @param createCourseDto - Data Transfer Object containing course details
    * @param teacher - The teacher creating the course
@@ -145,22 +126,9 @@ export class CoursesService extends CrudService<Course> {
     if (createCourseDto.invitationType === InvitationType.CODE) {
       // If invitation is by code, return the course code
       return { courseCode };
-    }
-    else {
-      throw new ConflictException('Invalid invitation type');
-    } /*else if (createCourseDto.invitationType === InvitationType.EMAIL) {
-      // If invitation is by email, ensure emails are provided
-      if (!createCourseDto.studentEmails || createCourseDto.studentEmails.length === 0) {
-        throw new ConflictException('Student emails are required for email invitations');
-      }
-      // Send invitation emails with the course code
-      await this.sendInvitationEmails(createCourseDto.studentEmails, courseCode);
-      // Return a success message
-      return { message: 'Invitation emails sent successfully' };
     } else {
-      // If invitation type is invalid, throw an exception
       throw new ConflictException('Invalid invitation type');
-    }*/
+    }
   }
 
   /**
@@ -193,13 +161,12 @@ export class CoursesService extends CrudService<Course> {
    * @param teacherId - The ID of the teacher
    * @returns An array of courses
    */
-  async findAllByTeacher(teacher?: Teacher
-    ): Promise<Course[]> {
+  async findAllByTeacher(teacher?: Teacher): Promise<Course[]> {
     // Find courses by teacher ID and ensure they're not deleted
     return this.Courserepository.find({
       where: {
         deletedAt: IsNull(),
-       teacher: { id: teacher?.id },
+        teacher: { id: teacher?.id },
       },
       select: ['id', 'title', 'description', 'type', 'startDate', 'courseCode'],
       relations: ['teacher'],
@@ -223,149 +190,149 @@ export class CoursesService extends CrudService<Course> {
       },
       relations: ['students'],
     });
-  
+
     if (!course) {
       throw new NotFoundException('Course not found');
     }
-  
+
     // Ensure the students array is initialized
     if (!course.students) {
       course.students = [];
     }
-  
+
     // Check if the student is already enrolled
-    if (course.students.some(s => s.id === student.id)) {
+    if (course.students.some((s) => s.id === student.id)) {
       throw new ConflictException('Already enrolled');
     }
-  
+
     // Add the student to the course
     course.students.push(student);
     // Save the updated course entity
     await this.Courserepository.save(course);
-  
+
     // Return a success message
     return { message: 'Successfully joined' };
+  }
+
+  /**
+   * Check if a user belongs to a course as a student or teacher
+   * @param userId - The ID of the user
+   * @param courseId - The ID of the course
+   * @returns 'student' if the user is a student, 'teacher' if the user is a teacher, or null if the user does not belong to the course
+   */
+  async checkIfUserBelongsToClass(userId: string, courseId: number): Promise<'student' | 'teacher' | null> {
+    const course = await this.Courserepository.findOne({
+      where: { id: courseId },
+      relations: ['students', 'teacher'], // Load necessary relations
+    });
+
+    if (!course) {
+      throw new NotFoundException('Course not found');
+    }
+
+    // Check if the user is a student
+    const isStudent = course.students?.some((student) => student.id === userId);
+
+    if (isStudent) {
+      return 'student';
+    }
+
+    // Check if the user is a teacher
+    const isTeacher = course.teacher?.id === userId;
+
+    if (isTeacher) {
+      return 'teacher';
+    }
+
+    return null; // User does not belong to the course
   }
 
   /**
    * Retrieve the list of students enrolled in a course
    * @param courseId - The ID of the course
+   * @param user - The user requesting the list (Teacher or Student)
    * @returns An object containing the students array and count
    */
-  async getCourseStudents(courseId: number, teacher: Teacher) {
-    // Find the course by ID, owned by the teacher, and not deleted
-    const course = await this.Courserepository.findOne({
-      where: {
-        id: courseId,
-        teacher: { id: teacher.id },
-        deletedAt: IsNull(),
-      },
-      relations: ['students'],
-    });
-
-    if (!course) {
-      // Course not found or does not belong to the teacher
-      throw new NotFoundException(
-        'Course not found or you do not have permission to view its students'
-      );
+  async getCourseStudents(courseId: number, user: User) {
+    // Vérifiez si l'utilisateur appartient au cours
+    const userRole = await this.checkIfUserBelongsToClass(user.id, courseId);
+  
+    if (userRole === 'teacher' || userRole === 'student') {
+      // Récupérez le cours avec les étudiants, indépendamment du rôle de l'utilisateur
+      const course = await this.Courserepository.findOne({
+        where: {
+          id: courseId,
+          deletedAt: IsNull(), // Assurez-vous que le cours n'est pas supprimé
+        },
+        relations: ['students'], // Chargez la relation des étudiants
+      });
+  
+      if (!course) {
+        throw new NotFoundException('Course not found');
+      }
+  
+      // Vérifiez les permissions supplémentaires en fonction du rôle
+      if (userRole === 'teacher') {
+        // Pour les enseignants, assurez-vous que le cours leur appartient
+        if (course.teacher.id !== user.id) {
+          throw new ForbiddenException('You do not have permission to view this course');
+        }
+      } else if (userRole === 'student') {
+        // Pour les étudiants, assurez-vous qu'ils sont inscrits dans le cours
+        const isEnrolled = course.students.some((student) => student.id === user.id);
+        if (!isEnrolled) {
+          throw new ForbiddenException('You are not enrolled in this course');
+        }
+      }
+  
+      // Retournez les étudiants du cours
+      return {
+        courseId: course.id,
+        title: course.title,
+        students: course.students.map((student) => ({
+          id: student.id,
+          firstName: student.firstName,
+          lastName: student.lastName,
+          email: student.email,
+          type: student.type,
+        })),
+        count: course.students.length,
+      };
+    } else {
+      throw new ForbiddenException('You do not have permission to access this resource');
     }
-
-    // Format the response
-    return {
-      courseId: course.id,
-      title: course.title,
-      students: course.students.map((student) => ({
-        id: student.id,
-        firstName: student.firstName,
-        lastName: student.lastName,
-        email: student.email,
-        type: student.type,
-      })),
-      count: course.students.length,
-    };
   }
 
-
   /**
-   * Allow a student to join a course via an invitation link (using course ID)
-   * @param courseId - The ID of the course
-   * @param student - The student joining the course
-   * @returns A success message
+   * Find all courses for a specific student
+   * @param student - The student
+   * @returns An array of courses
    */
- /* async joinCourseByInvitation(courseId: number, student?: Student): Promise<{ message: string }> {
-    // Find the course by ID and ensure it's not deleted
-    const course = await this.Courserepository.findOne({
-      where: {
-        id: courseId,
-        deletedAt: IsNull(),
-      },
-      relations: ['students'],
-    });
-    // If the course is not found, throw a NotFoundException
-    if (!course) {
-      throw new NotFoundException('Course not found');
-    }
-    // Ensure the students array is initialized
-    if (!course.students) {
-      course.students = [];
-    }
-    // Check if the student is already enrolled
-    if (student && course.students.some(s => s.id === student.id)) {
-      throw new ConflictException('Already enrolled');
-    }
-    // Add the student to the course
-    if (student) {
-      course.students.push(student);
-      // Save the updated course entity
-      await this.Courserepository.save(course);
-    }
-    // Return a success message
-    return { message: 'Successfully joined' };
-  }*/
-    async findStudentCourses(student: Student): Promise<Course[]> {
-      const courses = await this.Courserepository
-        .createQueryBuilder('course')
-        .innerJoin('course.students', 'student')
-        .where('student.id = :studentId', { studentId: student.id })
-        .andWhere('course.deletedAt IS NULL')
-        .leftJoinAndSelect('course.teacher', 'teacher') // Jointure avec l'enseignant
-        .select([
-          'course.id',
-          'course.title',
-          'course.description',
-          'course.type',
-          'course.startDate',
-          'course.courseCode',
-          'teacher.createdAt', // Sélectionner createdAt de l'enseignant
-          'teacher.updatedAt', // Sélectionner updatedAt de l'enseignant
-          'teacher.id', // Sélectionner l'ID de l'enseignant
-          'teacher.firstName', // Sélectionner le prénom de l'enseignant
-          'teacher.lastName', // Sélectionner le nom de l'enseignant
-          'teacher.email', // Sélectionner l'email de l'enseignant
-          'teacher.type', // Sélectionner le type de l'enseignant
-        ])
-        .orderBy('course.startDate', 'DESC')
-        .getMany();
-    
-      return courses;
-    }
-    /*  const course = await this.Courserepository
+  async findStudentCourses(student: Student): Promise<Course[]> {
+    const courses = await this.Courserepository
       .createQueryBuilder('course')
-      .innerJoinAndSelect('course.students', 'student') 
-      .where('course.id = :courseId', { courseId })
+      .innerJoin('course.students', 'student')
+      .where('student.id = :studentId', { studentId: student.id })
       .andWhere('course.deletedAt IS NULL')
+      .leftJoinAndSelect('course.teacher', 'teacher') // Join with the teacher
       .select([
         'course.id',
         'course.title',
-        'student.id',
-        'student.firstName',
-        'student.lastName',
-        'student.email',
-        'student.type'
+        'course.description',
+        'course.type',
+        'course.startDate',
+        'course.courseCode',
+        'teacher.createdAt', // Select teacher's createdAt
+        'teacher.updatedAt', // Select teacher's updatedAt
+        'teacher.id', // Select teacher's ID
+        'teacher.firstName', // Select teacher's first name
+        'teacher.lastName', // Select teacher's last name
+        'teacher.email', // Select teacher's email
+        'teacher.type', // Select teacher's type
       ])
-      .getOne();
-  
-    // Debug logs
-    console.log('Found course:', course);
-    console.log('Students:', course?.students);*/
+      .orderBy('course.startDate', 'DESC')
+      .getMany();
+
+    return courses;
+  }
 }

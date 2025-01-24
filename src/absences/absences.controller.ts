@@ -1,4 +1,3 @@
-// absences.controller.ts
 import { Controller, Post, Body, Param, Patch, Delete, Get, Query, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { AbsencesService } from './absences.service';
 import { CreateAbsenceDto } from './dto/create-absence.dto';
@@ -32,10 +31,9 @@ export class AbsencesController {
   @UseGuards(TeacherGuard)
   async validate(
     @Param('absenceId', ParseIntPipe) absenceId: number,
-    @Body() ValidateAbsenceDto: ValidateAbsenceDto,
     @GetUser() user: any,
   ) {
-    return this.absencesService.validateAbsence(user.id, absenceId, ValidateAbsenceDto);
+    return this.absencesService.validateAbsence(user.id, absenceId);
   }
 
   // for student 
@@ -70,13 +68,12 @@ export class AbsencesController {
     return this.absencesService.getAbsencesForCurrentStudent(user.id, GetAbsencesByStudentDto);
   }
 
-
   // for student 
   @UseGuards(StudentGuard)
   @Get('student/absence-count-course')
   async getAbsenceCountForStudent(
     @GetUser() user: any,
-    @Query() GetAbsencesByStudentDto: GetAbsencesByStudentDto,  // ID de l'étudiant et du cours dans le body
+    @Query() GetAbsencesByStudentDto: GetAbsencesByStudentDto,
   ) {
     return this.absencesService.getAbsenceCountForStudent(user.id, GetAbsencesByStudentDto);
   }
@@ -101,11 +98,12 @@ export class AbsencesController {
     return this.absencesService.getAbsenceCountsByCourseAndTeacher(user.id, getAbsencesByTeacherDto);
   }
 
-  @Patch(':absenceId/reject')
+  @Patch('teacher/:absenceId/reject')
   @UseGuards(TeacherGuard)
-  async rejectAbsenceJustification(
-    @Param('absenceId') absenceId: number,
+  async reject(
+    @Param('absenceId', ParseIntPipe) absenceId: number,
+    @GetUser() user: any,
   ) {
-    return this.absencesService.rejectAbsenceJustification(absenceId);
+    return this.absencesService.rejectAbsence(user.id, absenceId);
   }
 }

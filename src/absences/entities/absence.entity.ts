@@ -16,7 +16,7 @@ export class Absence {
   id: number;
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
-  deletedAt: Date; 
+  deletedAt: Date;
 
   @ManyToOne(() => Student, (student) => student.absences)
   student: Student;
@@ -31,8 +31,11 @@ export class Absence {
   justified: boolean;
 
   @Column({ type: 'text', nullable: true })
-  justification: string; 
-  
+  justification: string;
+
+  @Column({ default: false })
+  confirmed: boolean; // Nouveau champ pour suivre la confirmation par l'enseignant
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 }

@@ -62,7 +62,6 @@ export class AbsencesService extends CrudService<Absence> {
     return false; // L'utilisateur n'appartient ni à ce cours en tant qu'étudiant ni en tant qu'enseignant
   }
 
-
   async createAbsence(createAbsenceDto: CreateAbsenceDto, teacherId: string): Promise<Absence> {
     const { studentId, courseId, date } = createAbsenceDto;
 
@@ -93,6 +92,7 @@ export class AbsencesService extends CrudService<Absence> {
       course,
       date,
       justified: false,
+      justification: null, // Initialiser la justification à null
     });
 
     return this.absenceRepository.save(absence);
@@ -123,58 +123,83 @@ export class AbsencesService extends CrudService<Absence> {
     const { justification } = updateAbsenceDto;
     const absence = await this.absenceRepository.findOne({
       where: { id },
-      relations: ['course']
+      relations: ['course'],
     });
-
+  
     if (!absence) {
       throw new NotFoundException('Absence not found');
     }
-
+  
     // Vérifier que l'étudiant appartient au cours avant de justifier l'absence
     const isUserInClass = await this.checkIfUserBelongsToClass(studentId, absence.course.id);
     if (!isUserInClass) {
       throw new ConflictException('Student is not enrolled in this course');
     }
-
+  
     if (absence.deletedAt) {
       throw new ConflictException('Cannot justify a deleted absence');
     }
-
+  
     if (absence.justification) {
       throw new ConflictException('Absence has already been justified');
     }
-
+  
     absence.justification = justification;
+    absence.justified = true;
     return this.absenceRepository.save(absence);
   }
 
-  async validateAbsence(teacherId: string, id: number, validateAbsenceDto: ValidateAbsenceDto): Promise<Absence> {
-    const { justified } = validateAbsenceDto;
+  async validateAbsence(teacherId: string, id: number): Promise<Absence> {
     const absence = await this.absenceRepository.findOne({
       where: { id },
-      relations: ['course']
+      relations: ['course'],
     });
-
+  
     if (!absence) {
       throw new NotFoundException('Absence not found');
     }
-
-    // Vérifier que le professeur appartient au cours avant de valider l'absence
+  
+    // Vérifier que le professeur appartient au cours
     const isUserInClass = await this.checkIfUserBelongsToClass(teacherId, absence.course.id);
     if (!isUserInClass) {
-      
       throw new ConflictException('Teacher is not enrolled in this course');
     }
-
-    if (absence.deletedAt) {
-      throw new ConflictException('Cannot validate a deleted absence');
+  
+    if (!absence.justification) {
+      throw new ConflictException('Absence has no justification to validate');
     }
-
-    if (absence.justified) {
-      throw new ConflictException('Absence has already been justified');
+  
+    absence.confirmed = true; 
+    absence.justification = null;
+    absence.justified = true; 
+  
+    return this.absenceRepository.save(absence);
+  }
+  
+  async rejectAbsence(teacherId: string, id: number): Promise<Absence> {
+    const absence = await this.absenceRepository.findOne({
+      where: { id },
+      relations: ['course'],
+    });
+  
+    if (!absence) {
+      throw new NotFoundException('Absence not found');
     }
+  
+    // Vérifier que le professeur appartient au cours
+    const isUserInClass = await this.checkIfUserBelongsToClass(teacherId, absence.course.id);
+    if (!isUserInClass) {
+      throw new ConflictException('Teacher is not enrolled in this course');
+    }
+  
+    if (!absence.justification) {
+      throw new ConflictException('Absence has no justification to reject');
+    }
+  
+    absence.confirmed = false; 
+    absence.justification = null; 
 
-    absence.justified = justified;
+  
     return this.absenceRepository.save(absence);
   }
 
@@ -298,6 +323,7 @@ export class AbsencesService extends CrudService<Absence> {
         course: absence.course,
         date: absence.date,
         justified: absence.justified,
+        justification: absence.justification,
       });
 
       return acc;
@@ -312,100 +338,78 @@ export class AbsencesService extends CrudService<Absence> {
   ): Promise<any> {
     const course = await this.courseRepository.findOne({
       where: { id: getAbsencesByTeacherDto.courseId },
+      relations: ['students'], // Charger les étudiants inscrits au cours
     });
-
+  
     if (!course) {
       throw new NotFoundException('Course not found');
     }
-
+  
     // Vérification de l'appartenance avant de continuer
     const isUserInClass = await this.checkIfUserBelongsToClass(teacherId, getAbsencesByTeacherDto.courseId);
     if (!isUserInClass) {
       throw new ConflictException('Teacher is not associated with this course');
     }
-
-    // Fetch students with their absences and justifications
-    const studentsWithAbsences = await this.studentRepository
-      .createQueryBuilder('student')
-      .leftJoinAndSelect('student.absences', 'absence')
-      .where('absence.courseId = :courseId', { courseId: course.id })
-      .andWhere('absence.deletedAt IS NULL')
-      .select([
-        'student.firstName',
-        'student.lastName',
-        'student.email',
-        'absence.justification',
-        'absence.justified',
-        'absence.date',
-        'SUM(CASE WHEN absence.justified = true THEN 1 ELSE 0 END) as justifiedCount',
-        'SUM(CASE WHEN absence.justified = false THEN 1 ELSE 0 END) as nonJustifiedCount'
-      ])
-      .groupBy('student.id, absence.id')  // Include absence.id to get individual absences
-      .orderBy('absence.date', 'DESC')    // Order by date to get the latest absences first
-      .getRawMany();
-
-    // Transform and group the raw query results by student
-    const studentMap = new Map();
-
-    studentsWithAbsences.forEach(record => {
-      const studentKey = record.student_email; // Using email as a unique identifier
-
-      if (!studentMap.has(studentKey)) {
-        studentMap.set(studentKey, {
-          firstName: record.student_firstName,
-          lastName: record.student_lastName,
-          email: record.student_email,
-          absenceCounts: {
-            justifiedCount: 0,
-            nonJustifiedCount: 0,
-            totalCount: 0
-          },
-          absences: []
-        });
-      }
-
-      const student = studentMap.get(studentKey);
-
-      // Only add absence if it exists (not null)
-      if (record.absence_date) {
-        student.absences.push({
-          date: record.absence_date,
-          justified: record.absence_justified,
-          justification: record.absence_justification
-        });
-
-        // Update counts
-        if (record.absence_justified) {
-          student.absenceCounts.justifiedCount++;
-        } else {
-          student.absenceCounts.nonJustifiedCount++;
-        }
-        student.absenceCounts.totalCount++;
-      }
-    });
-
-    return Array.from(studentMap.values());
-  }
-
-  async rejectAbsenceJustification(absenceId: number): Promise<Absence> {
-    // Fetch the absence
-    const absence = await this.absenceRepository.findOne({
-      where: { id: absenceId },
+  
+    // Récupérer tous les étudiants inscrits au cours
+    const students = course.students;
+  
+    // Récupérer les absences pour ce cours
+    const absences = await this.absenceRepository.find({
+      where: {
+        course: { id: course.id },
+        deletedAt: null,
+      },
+      relations: ['student'],
     });
   
-    if (!absence) {
-      throw new NotFoundException('Absence not found');
-    }
+    // Créer un map pour stocker les absences par étudiant
+    const absenceMap = new Map<string, any>();
+    absences.forEach(absence => {
+      const studentId = absence.student.id;
+      if (!absenceMap.has(studentId)) {
+        absenceMap.set(studentId, {
+          justifiedCount: 0,
+          nonJustifiedCount: 0,
+          totalCount: 0,
+          absences: [],
+        });
+      }
+      const studentAbsences = absenceMap.get(studentId);
+      if (absence.justified) {
+        studentAbsences.justifiedCount++;
+      } else {
+        studentAbsences.nonJustifiedCount++;
+      }
+      studentAbsences.totalCount++;
+      studentAbsences.absences.push({
+        date: absence.date,
+        justified: absence.justified,
+        justification: absence.justification,
+      });
+    });
   
-    // Check if the absence has already been deleted
-    if (absence.deletedAt) {
-      throw new ConflictException('Cannot reject a deleted absence');
-    }
+    // Construire le résultat final en incluant tous les étudiants
+    const result = students.map(student => {
+      const studentAbsences = absenceMap.get(student.id) || {
+        justifiedCount: 0,
+        nonJustifiedCount: 0,
+        totalCount: 0,
+        absences: [],
+      };
+      return {
+        firstName: student.firstName,
+        lastName: student.lastName,
+        email: student.email,
+        absenceCounts: {
+          justifiedCount: studentAbsences.justifiedCount,
+          nonJustifiedCount: studentAbsences.nonJustifiedCount,
+          totalCount: studentAbsences.totalCount,
+        },
+        absences: studentAbsences.absences,
+      };
+    });
   
-    // Set the justification to null
-    absence.justification = null;
-  
-    // Save the updated absence
-    return this.absenceRepository.save(absence);
+    return result;
   }
 }

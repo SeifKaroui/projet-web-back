@@ -151,7 +151,7 @@ async function seedCourses(
       startDate: new Date('2024-03-01'),
       endDate: new Date('2024-06-30'),
       teacher: teachers[0],
-      students: [students[0], students[1]],
+      students: [students[0], students[1],students[2],students[3]],
     },
     {
       id: 2,

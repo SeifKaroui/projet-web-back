@@ -36,6 +36,9 @@ export class Absence {
   @Column({ default: false })
   confirmed: boolean; // Nouveau champ pour suivre la confirmation par l'enseignant
 
+  @Column({ default: false })
+  rejected: boolean; // Nouveau champ pour suivre si la justification est rejetée
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 }

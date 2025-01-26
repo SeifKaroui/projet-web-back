@@ -6,16 +6,10 @@ import { Course } from 'src/courses/entities/course.entity';
 import { Repository } from 'typeorm';
 import { CreateAbsenceDto } from './dto/create-absence.dto';
 import { UpdateAbsenceDto } from './dto/update-absence.dto';
-import { DeleteAbsenceDto } from './dto/delete-absence.dto';
 import { GetAbsencesByTeacherDto } from './dto/get-absences-by-teacher.dto';
 import { CrudService } from 'src/common/generics/crud.service';
 import { GetAbsencesByStudentDto } from './dto/get-absences-by-student.dto';
-import { ValidateAbsenceDto } from './dto/validate-absence.dto';
 
-interface GroupedAbsence {
-  student: Student;
-  absences: { course: Course; date: Date; justified: boolean }[];
-}
 
 @Injectable()
 export class AbsencesService extends CrudService<Absence> {
@@ -143,7 +137,7 @@ export class AbsencesService extends CrudService<Absence> {
     if (absence.justification) {
       throw new ConflictException('Absence has already been justified');
     }
-  
+    absence.confirmed=false;
     absence.justification = justification;
     absence.justified = true;
     return this.absenceRepository.save(absence);
@@ -154,25 +148,23 @@ export class AbsencesService extends CrudService<Absence> {
       where: { id },
       relations: ['course'],
     });
-  
+
     if (!absence) {
       throw new NotFoundException('Absence not found');
     }
-  
+
     // Vérifier que le professeur appartient au cours
     const isUserInClass = await this.checkIfUserBelongsToClass(teacherId, absence.course.id);
     if (!isUserInClass) {
       throw new ConflictException('Teacher is not enrolled in this course');
     }
-  
+
     if (!absence.justification) {
       throw new ConflictException('Absence has no justification to validate');
     }
-  
-    absence.confirmed = true; 
-    absence.justification = null;
-    absence.justified = true; 
-  
+
+    absence.confirmed = true;
+    absence.rejected = false; // Réinitialiser le statut rejeté
     return this.absenceRepository.save(absence);
   }
   
@@ -196,10 +188,8 @@ export class AbsencesService extends CrudService<Absence> {
       throw new ConflictException('Absence has no justification to reject');
     }
   
-    absence.confirmed = false; 
-    absence.justification = null; 
-
-  
+    absence.confirmed = false;
+    absence.rejected = true; // Marquer comme rejeté
     return this.absenceRepository.save(absence);
   }
 
@@ -338,23 +328,20 @@ export class AbsencesService extends CrudService<Absence> {
   ): Promise<any> {
     const course = await this.courseRepository.findOne({
       where: { id: getAbsencesByTeacherDto.courseId },
-      relations: ['students'], // Charger les étudiants inscrits au cours
+      relations: ['students'],
     });
   
     if (!course) {
       throw new NotFoundException('Course not found');
     }
   
-    // Vérification de l'appartenance avant de continuer
     const isUserInClass = await this.checkIfUserBelongsToClass(teacherId, getAbsencesByTeacherDto.courseId);
     if (!isUserInClass) {
       throw new ConflictException('Teacher is not associated with this course');
     }
   
-    // Récupérer tous les étudiants inscrits au cours
     const students = course.students;
   
-    // Récupérer les absences pour ce cours
     const absences = await this.absenceRepository.find({
       where: {
         course: { id: course.id },
@@ -363,7 +350,6 @@ export class AbsencesService extends CrudService<Absence> {
       relations: ['student'],
     });
   
-    // Créer un map pour stocker les absences par étudiant
     const absenceMap = new Map<string, any>();
     absences.forEach(absence => {
       const studentId = absence.student.id;
@@ -371,6 +357,8 @@ export class AbsencesService extends CrudService<Absence> {
         absenceMap.set(studentId, {
           justifiedCount: 0,
           nonJustifiedCount: 0,
+          validatedJustifications: 0,
+          rejectedJustifications: 0,
           totalCount: 0,
           absences: [],
         });
@@ -378,32 +366,44 @@ export class AbsencesService extends CrudService<Absence> {
       const studentAbsences = absenceMap.get(studentId);
       if (absence.justified) {
         studentAbsences.justifiedCount++;
+        if (absence.confirmed) {
+          studentAbsences.validatedJustifications++;
+        } else if (absence.rejected) {
+          studentAbsences.rejectedJustifications++;
+        }
       } else {
         studentAbsences.nonJustifiedCount++;
       }
       studentAbsences.totalCount++;
       studentAbsences.absences.push({
+        id: absence.id,
         date: absence.date,
         justified: absence.justified,
         justification: absence.justification,
+        confirmed: absence.confirmed,
+        rejected: absence.rejected, // Assurez-vous que ce champ est correctement renvoyé
       });
     });
   
-    // Construire le résultat final en incluant tous les étudiants
     const result = students.map(student => {
       const studentAbsences = absenceMap.get(student.id) || {
         justifiedCount: 0,
         nonJustifiedCount: 0,
+        validatedJustifications: 0,
+        rejectedJustifications: 0,
         totalCount: 0,
         absences: [],
       };
       return {
+        id: student.id,
         firstName: student.firstName,
         lastName: student.lastName,
         email: student.email,
         absenceCounts: {
           justifiedCount: studentAbsences.justifiedCount,
           nonJustifiedCount: studentAbsences.nonJustifiedCount,
+          validatedJustifications: studentAbsences.validatedJustifications,
+          rejectedJustifications: studentAbsences.rejectedJustifications,
           totalCount: studentAbsences.totalCount,
         },
         absences: studentAbsences.absences,

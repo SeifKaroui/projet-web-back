@@ -101,4 +101,14 @@ async getStudentsSubmissions(
   return this.submissionsService.getStudentsSubmissionStatus(homeworkId, user.id);
 }
 
+
+
+@Get('student-work/:homeworkId')
+async getStudentWork(
+  @Param('homeworkId') homeworkId: number,
+  @GetUser() user: JwtUser,
+) {
+  
+  return this.submissionsService.findAllSubmissionsByStudentAndHomework(homeworkId, user.id);
+}
 }

@@ -61,7 +61,7 @@ export class HomeworkController {
         type: 'multipart/form-data',
         schema: {
           type: 'object',
-          required: ['files', 'title','deadline','description','courseId'], 
+          required: [ 'title','deadline','description','courseId'], 
           properties: {
             courseId: {
                 type: 'integer',
@@ -113,7 +113,7 @@ export class HomeworkController {
     ): Promise<Homework|HttpException> {
         return this.homeworkService.update_hw(id, user, updateHomeworkDTO,files);
     }
-    @Patch("delete/:id")
+    @Delete("delete/:id")
     @UseGuards(TeacherGuard)
     deleteHomework(
         @Param('id') id: number

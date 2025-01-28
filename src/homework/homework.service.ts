@@ -29,10 +29,10 @@ export class HomeworkService extends CrudService<Homework> {
             throw new ForbiddenException('You are not the teacher of this course');
         }
         if (files == undefined){
-            return super.create({...addDto,teacher:teacher});
+            return super.create({...addDto,teacher:teacher,course:course});
         }
         const uploads:Upload[]= await this.uploadsService.saveFiles(files);
-        return super.create({...addDto,teacher:teacher,files:uploads});      
+        return super.create({...addDto,teacher:teacher,course:course,files:uploads});      
     }
     //need to be checked
     async update_hw(id: ID, teacher: User, updateDto: DeepPartial<Homework>,files:Express.Multer.File[]): Promise<Homework> {

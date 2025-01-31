@@ -12,7 +12,6 @@ import { Upload } from 'src/uploads/entities/upload.entity';
 
 @Injectable()
 export class HomeworkSubmissionsService {
-  
   constructor(
     @InjectRepository(HomeworkSubmission)
     private readonly submissionsRepository: Repository<HomeworkSubmission>,
@@ -61,7 +60,7 @@ export class HomeworkSubmissionsService {
         throw new NotFoundException('Student not found');
       }
 
-      const isEnrolled = student.enrolled_courses.some(course => course.id === homework.course.id);
+      const isEnrolled = student.courses.some(course => course.id === homework.course.id);
       if (!isEnrolled) {
 
         throw new ForbiddenException('You are not enrolled in this course');
@@ -204,21 +203,5 @@ export class HomeworkSubmissionsService {
 
     return response;
   }
-async findAllSubmissionsByStudentAndHomework(
-      homeworkId: number,
-      studentId: string
-    ): Promise<HomeworkSubmission[]> {
-      const qb = this.submissionsRepository.createQueryBuilder('hs');
-      
-      qb.leftJoinAndSelect('hs.homework', 'h');
-      qb.leftJoinAndSelect('hs.student', 's');
-      qb.leftJoinAndSelect('hs.uploads', 'u'); // Include uploads if needed
-      
-      qb.andWhere('s.id = :studentId', { studentId });
-      qb.andWhere('h.id = :homeworkId', { homeworkId });
-      qb.andWhere('hs.deleted_at IS NULL'); // Optional: Exclude soft-deleted submissions
-      
-      return qb.getMany();
-    }
-  }
 
+}

@@ -71,6 +71,13 @@ export class HomeworkSubmissionsController {
     }
     return this.submissionsService.submitHomework(user.id, dto.homeworkId, files);
   }
+  @Get(':homeworkId')
+async getHomeworkForStudent(
+  @Param('homeworkId') homeworkId: number,
+  @GetUser() user: JwtUser
+) {
+  return this.submissionsService.getStudentHomework(user.id, homeworkId);
+}
   
   @Delete(':Homeworkid')
   async deleteSubmission(

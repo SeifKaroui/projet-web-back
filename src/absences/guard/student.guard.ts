@@ -10,7 +10,6 @@ export class StudentGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
     const user: User = request.user;
-    console.log(user);
     // Vérifier si l'utilisateur est authentifié
     if (!user) {
       throw new UnauthorizedException('User not authenticated');

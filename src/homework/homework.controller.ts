@@ -113,7 +113,7 @@ export class HomeworkController {
     ): Promise<Homework|HttpException> {
         return this.homeworkService.update_hw(id, user, updateHomeworkDTO,files);
     }
-    @Delete("delete/:id")
+    @Delete(":id")
     @UseGuards(TeacherGuard)
     deleteHomework(
         @Param('id') id: number

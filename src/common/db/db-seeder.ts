@@ -30,6 +30,7 @@ export async function seedData(dataSource: DataSource) {
   await seedHomework(dataSource, courses, teachers);
   await seedAbsences(dataSource, students, courses);
   await seedPosts(dataSource);
+  // await seedUploadsForHomework(dataSource);
 }
 
 async function seedPosts(dataSource: DataSource) {
@@ -238,7 +239,7 @@ async function seedHomework(
       id: 1,
       title: 'Homework 1',
       description: 'Create a simple JavaScript application',
-      deadline: new Date('2024-03-15'),
+      deadline: new Date('2025-03-15'),
       course: courses[0],
       teacher: teachers[0],
     },
@@ -281,6 +282,14 @@ async function seedHomework(
       deadline: new Date('2024-04-15'),
       course: courses[4],
       teacher: teachers[3],
+    },
+    {
+      id: 7,
+      title: 'Homework 7',
+      description: 'Create a web serve in node',
+      deadline: new Date('2024-03-15'),
+      course: courses[0],
+      teacher: teachers[0],
     },
   ]);
 }
@@ -439,4 +448,10 @@ async function seedAbsences(
       justification: 'Traveling',
     },
   ]);
+}
+
+async function seedUploadsForHomework(dataSource: DataSource) {
+  const homeworkRepository = dataSource.getRepository(Homework);
+  const homework1 = await homeworkRepository.findOneBy({ id: 1 });
+  await homeworkRepository.save({ ...homework1, files: [{ id: 1 }, { id: 2 }] })
 }

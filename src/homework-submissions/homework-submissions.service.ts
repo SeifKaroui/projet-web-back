@@ -53,14 +53,14 @@ export class HomeworkSubmissionsService {
 
       const student = await this.studentsRepository.findOne({
         where: { id: studentId },
-        relations: ['courses'],
+        relations: ['enrolled_courses'],
       });
       if (!student) {
 
         throw new NotFoundException('Student not found');
       }
 
-      const isEnrolled = student.courses.some(course => course.id === homework.course.id);
+      const isEnrolled = student.enrolled_courses.some(course => course.id === homework.course.id);
       if (!isEnrolled) {
 
         throw new ForbiddenException('You are not enrolled in this course');

@@ -143,8 +143,6 @@ export class PostsService extends CrudService<Post> {
     if (!course) {
       throw new NotFoundException(`Course with id: ${courseId} not found.`);
     }
-    console.log(user);
-    console.log(course);
     if (user.type == UserType.Teacher && course.teacher.id == user.id) {
       return true;
     }
@@ -170,7 +168,6 @@ export class PostsService extends CrudService<Post> {
       .andWhere('user_enrolled_courses.courseId = :courseId', { courseId })
       .getRawOne();
 
-    console.log(userEnrolledInCourse);
     if (!userEnrolledInCourse) {
       return false;
     }

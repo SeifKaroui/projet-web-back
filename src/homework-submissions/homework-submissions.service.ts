@@ -84,6 +84,21 @@ export class HomeworkSubmissionsService {
       throw error;
     }
   }
+  
+async getStudentHomework(studentId: string, homeworkId: number) {
+  const submission = await this.submissionsRepository.findOne({
+    where: {
+      student: { id: studentId },
+      homework: { id: homeworkId },
+    },
+    relations: ['homework', 'homework.course', 'uploads'],
+  });
+
+  if (!submission) {
+    throw new NotFoundException('No submission found for this homework and student');
+  }
+  return submission;
+}
   async deleteSubmission(homeworkId: number, studentId: string) {
     const submission = await this.submissionsRepository.findOne({
       where: {

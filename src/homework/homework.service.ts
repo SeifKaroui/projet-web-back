@@ -69,7 +69,7 @@ export class HomeworkService extends CrudService<Homework> {
     findAll_student(StudentId: string,courseId?: number): Promise<Homework[]> {
         const qb = this.homeworkRepository.createQueryBuilder('h');
         qb.leftJoinAndSelect('h.files','f');
-        qb.leftJoin('h.course','c');
+        qb.leftJoinAndSelect('h.course','c');
         qb.leftJoin('c.students','s');
         qb.andWhere('s.id = :StudentId',{StudentId});
         qb.andWhere("h.deleted_at IS NULL");
@@ -81,6 +81,7 @@ export class HomeworkService extends CrudService<Homework> {
     findAll_teacher(teacherId: string,courseId?:number): Promise<Homework[]> {
         const qb = this.homeworkRepository.createQueryBuilder('h');
         qb.leftJoinAndSelect('h.files','f');
+        qb.leftJoinAndSelect('h.course','c');
         qb.andWhere("h.teacherId = :teacherId", { teacherId });
         qb.andWhere("h.deleted_at IS NULL");
         if (courseId){

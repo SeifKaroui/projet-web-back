@@ -26,7 +26,7 @@ export class Homework extends TimeStampEntity {
   @Column({ type: 'timestamp' })
   deadline: Date;
 
-  @ManyToOne(() => Course, (course) => course.homeworks)
+  @ManyToOne(() => Course, (course) => course.homeworks,{eager: true})
   course: Course;
 
   @ManyToOne(() => Teacher, (teacher) => teacher.homeworks)

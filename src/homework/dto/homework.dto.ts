@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional } from 'class-validator';
+import { Course } from 'src/courses/entities/course.entity';
 import { HomeworkSubmission } from 'src/homework-submissions/entities/homework-submission.entity';
 import { Upload } from 'src/uploads/entities/upload.entity';
 import { Unique } from 'typeorm';
@@ -50,6 +51,7 @@ export class HomeworkResponseDTO {
   description: string;
   deadline: Date;
   createdAt: Date;
+  course:Course;
   files: Upload[];
   submissions: HomeworkSubmission[];
 }

@@ -6,30 +6,20 @@ import { AccessTokenStrategy } from './strategies/accessToken.strategy';
 import { RefreshTokenStrategy } from './strategies/refreshToken.strategy';
 import { UsersModule } from 'src/users/users.module';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './jwt.strategy';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AccessTokenQueryParamStrategy } from './strategies/accessTokenQueryParam.strategy';
 
 @Module({
   imports: [
-    PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_ACCESS_SECRET'),
-        signOptions: {
-          expiresIn: '60m',
-        },
-      }),
-    }),
+    PassportModule,
+    JwtModule,
     UsersModule,
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
     AccessTokenStrategy,
+    AccessTokenQueryParamStrategy,
     RefreshTokenStrategy,
-    JwtStrategy,
   ],
   exports: [PassportModule, JwtModule],
 })

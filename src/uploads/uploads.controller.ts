@@ -7,18 +7,20 @@ import {
   Post,
   UploadedFiles,
   UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiQuery } from '@nestjs/swagger';
 import { UploadsService } from './uploads.service';
 import { Public } from 'src/common/decorators/public.decorator';
 import { Response } from 'express';
 import { CustomFilesInterceptor } from 'src/common/interceptors/custom-files.interceptor';
 import { Upload } from './entities/upload.entity';
+import { AccessTokenQueryParamGuard } from 'src/common/guards/accessTokenQueryParam.guard';
 
 @ApiBearerAuth()
 @Controller('files')
 export class UploadsController {
-  constructor(private readonly uploadsService: UploadsService) {}
+  constructor(private readonly uploadsService: UploadsService) { }
   @Public()
   @Post('upload')
   @UseInterceptors(CustomFilesInterceptor)
@@ -50,8 +52,10 @@ export class UploadsController {
   }
 
   @Public()
+  @UseGuards(AccessTokenQueryParamGuard)
+  @ApiQuery({ name: 'token', type: String, required: true, description: 'JWT Access Token' })
   @Get(':fileId')
-  async retrieve(
+  async retrieveFile(
     @Param('fileId', ParseIntPipe) fileId: number,
     @Res() res: Response,
   ) {

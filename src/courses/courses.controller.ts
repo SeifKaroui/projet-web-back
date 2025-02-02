@@ -3,7 +3,6 @@ import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { Student, Teacher, User } from '../users/entities/user.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { TeacherGuard } from '../auth/guards/teacher.guard';
 import { JoinCourseDto } from './dto/join-course.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -14,24 +13,20 @@ import { StudentGuard } from 'src/auth/guards/student.guard';
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) { }
 
-  @UseGuards(JwtAuthGuard, TeacherGuard)
+  @UseGuards(TeacherGuard)
   @Post()
   @ApiBearerAuth()
   create(@Body() createCourseDto: CreateCourseDto, @GetUser() teacher: Teacher) {
     return this.coursesService.create(createCourseDto, teacher);
   }
-  @UseGuards(JwtAuthGuard, TeacherGuard)
+  @UseGuards(TeacherGuard)
   @Get('my-courses')
   @ApiBearerAuth()
   async findAllByTeacher(@GetUser() teacher: Teacher) {
     return this.coursesService.findAllByTeacher(teacher);
   }
-  /*@Get('all')
-  @ApiBearerAuth()
-  async findAll() {
-    return this.coursesService.findAll();
-  }*/
-  @UseGuards(JwtAuthGuard, TeacherGuard)
+
+  @UseGuards(TeacherGuard)
   @Delete(':id') //(//change to patch)
   @ApiBearerAuth()
   archive(@Param('id', ParseIntPipe) id: number, @GetUser() teacher: Teacher) {
@@ -39,7 +34,7 @@ export class CoursesController {
   }
 
 
-  @UseGuards(JwtAuthGuard, StudentGuard)
+  @UseGuards(StudentGuard)
   @Post('join')
   @ApiBearerAuth()
   async joinCourse(
@@ -49,7 +44,6 @@ export class CoursesController {
     return this.coursesService.joinCourseByCode(joinCourseDto.code, student);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get(':id/students')
   @ApiBearerAuth()
   async getCourseStudents(
@@ -60,20 +54,7 @@ export class CoursesController {
   }
 
 
-
-  /* @Post(':id/join')
-
-    //return the students of a course by invitation with the course id
-
-
-   @ApiBearerAuth()
-/*async joinByInvitation(
-  @Param('id', ParseIntPipe) courseId: number,
-  @GetUser() student: Student
-) {
-  return this.coursesService.joinCourseByInvitation(courseId, student );
-}*/
-  @UseGuards(JwtAuthGuard, StudentGuard)
+  @UseGuards(StudentGuard)
   @Get('my-enrolled-courses')
   @ApiBearerAuth()
   async getEnrolledCourses(@GetUser() student: Student) {

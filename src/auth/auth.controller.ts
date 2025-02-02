@@ -43,7 +43,7 @@ export class AuthController {
     return this.authService.refreshTokens(userId);
   }
 
-  extractUserId(req: any): string {
-    return req.user['sub'];
+  private extractUserId(req: any): string {
+    return req.user['id'];
   }
 }

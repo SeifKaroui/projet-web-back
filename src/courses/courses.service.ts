@@ -1,21 +1,12 @@
-// Import necessary modules and decorators from NestJS
 import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
-// Import InjectRepository to inject TypeORM repositories
 import { InjectRepository } from '@nestjs/typeorm';
-// Import TypeORM modules for repository and query operations
 import { Repository, IsNull } from 'typeorm';
-// Import the Course entity
 import { Course } from './entities/course.entity';
-// Import Student and Teacher entities
 import { Student, Teacher, User } from 'src/users/entities/user.entity';
-// Import MailerService for sending emails
 import { MailerService } from '@nestjs-modules/mailer';
-// Import CreateCourseDto and InvitationType enum for course creation
 import { CreateCourseDto, InvitationType } from './dto/create-course.dto';
-// Import the base CrudService
 import { CrudService } from 'src/common/generics/crud.service';
 
-// Mark the class as Injectable so it can be provided via dependency injection
 @Injectable()
 export class CoursesService extends CrudService<Course> {
   /**
@@ -24,14 +15,10 @@ export class CoursesService extends CrudService<Course> {
    * @param mailerService - Service for sending emails
    */
   constructor(
-    // Inject the Course repository
     @InjectRepository(Course)
-    // Define the repository for use in methods
     public Courserepository: Repository<Course>,
-    // Inject the MailerService
     //private readonly mailerService: MailerService,
   ) {
-    // Call the base class constructor with the repository
     super(Courserepository);
   }
 

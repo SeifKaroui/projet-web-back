@@ -7,8 +7,6 @@ import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { CreateHomeworkDTO, UpdateHomeworkDTO } from './dto/homework.dto';
 import { CustomFilesInterceptor } from 'src/common/interceptors/custom-files.interceptor';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { Course } from 'src/courses/entities/course.entity';
-import { title } from 'process';
 
 @ApiBearerAuth()
 @Controller('homework')

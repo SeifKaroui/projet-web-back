@@ -31,7 +31,7 @@ export class PostsController {
   }
 
   @Get('/posts/:postId')
-  findOneByCourse(
+  findOne(
     @GetUser() user: JwtUser,
     @Param('postId') postId: number,
   ): Promise<Post> {

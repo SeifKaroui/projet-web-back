@@ -11,7 +11,6 @@ import { PostModule } from './posts/post.module';
 import { CommentsModule } from './comments/comments.module';
 import { HomeworkModule } from './homework/homework.module';
 import { HomeworkSubmissionsModule } from './homework-submissions/homework-submissions.module';
-import { MessagesModule } from './messages/messages.module';
 
 import { APP_GUARD } from '@nestjs/core';
 import { AccessTokenGuard } from './common/guards/accessToken.guard';
@@ -65,7 +64,6 @@ import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_TYPE, DB_USERNAME } from
     CommentsModule,
     HomeworkModule,
     HomeworkSubmissionsModule,
-    MessagesModule,
     UploadsModule,
   ],
   providers: [

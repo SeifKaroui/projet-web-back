@@ -9,11 +9,9 @@ import {
   JoinTable,
 } from 'typeorm';
 import { Comment } from '../../comments/entities/comment.entity';
-import { Message } from '../../messages/entities/message.entity';
 import { Course } from 'src/courses/entities/course.entity';
 import { Absence } from 'src/absences/entities/absence.entity';
 import { HomeworkSubmission } from 'src/homework-submissions/entities/homework-submission.entity';
-import { Post } from 'src/posts/entities/post.entity';
 import { UserType } from '../enums/user-type.enum';
 import { TimeStampEntity } from 'src/common/db/timestamp.entity';
 import { Exclude } from 'class-transformer';
@@ -47,13 +45,6 @@ export class User extends TimeStampEntity {
   @OneToMany(() => Comment, (comment) => comment.author)
   comments: Comment[];
 
-  @ApiHideProperty()
-  @OneToMany(() => Message, (message) => message.sender)
-  sentMessages: Message[];
-
-  @ApiHideProperty()
-  @OneToMany(() => Message, (message) => message.receiver)
-  receivedMessages: Message[];
 }
 
 @ChildEntity(UserType.Student)

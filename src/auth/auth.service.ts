@@ -26,7 +26,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
-  ) {}
+  ) { }
   async signUp(createUserDto: CreateUserDto): Promise<SignUpResponseDto> {
     const newUser = await this.usersService.create(createUserDto);
 
@@ -90,9 +90,11 @@ export class AuthService {
   }
 
   async refreshTokens(userId: string) {
+    if (!userId) {
+      throw new ForbiddenException('Access Denied');
+    }
     const user = await this.usersService.findOne(userId);
     if (!user) throw new ForbiddenException('Access Denied');
-
     return await this.getTokens(user);
   }
 }

@@ -8,12 +8,10 @@ import {
   AUTH_TYPE,
   JWT_REFRESH_SECRET,
 } from '../constants/auth.constant';
+import { JwtUser } from '../interfaces/jwt-user.interface';
 
 @Injectable()
-export class RefreshTokenStrategy extends PassportStrategy(
-  Strategy,
-  'jwt-refresh',
-) {
+export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refresh',) {
   constructor(private configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -22,7 +20,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     });
   }
 
-  validate(req: Request, payload: any) {
+  validate(req: Request, payload: JwtUser) {
     const refreshToken = req.get(AUTH_HEADER).replace(AUTH_TYPE, '').trim();
     return { ...payload, refreshToken };
   }

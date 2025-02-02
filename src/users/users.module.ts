@@ -9,7 +9,7 @@ import { Teacher } from './entities/user.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Student, Teacher])],
-  controllers: [UsersController],
+  controllers: [],
   providers: [UsersService],
   exports: [UsersService, TypeOrmModule],
 })

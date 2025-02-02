@@ -1,6 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { IsUUID, IsDateString, IsBoolean, IsInt, IsString, IsOptional } from 'class-validator';
-//dto
+
 export class CreateAbsenceDto {
 
   @IsUUID()

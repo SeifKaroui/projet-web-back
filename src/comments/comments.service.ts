@@ -40,7 +40,7 @@ export class CommentService extends CrudService<Comment> {
     // Get all comments for a specific post
     async findAllByPost(postId: number): Promise<Comment[]> {
         return this.commentRepository.find({
-            where: { post: { id: postId } }, // Utilisez l'ID directement
+            where: { post: { id: postId } },
             relations: ['author'], // Chargez la relation 'author'
         });
     }
@@ -50,7 +50,7 @@ export class CommentService extends CrudService<Comment> {
         if (!comment) {
             throw new NotFoundException(`Comment with ID ${id} not found`);
         }
-    
-        await this.commentRepository.softDelete(id); // Soft delete
+
+        await this.commentRepository.softDelete(id);
     }
 }

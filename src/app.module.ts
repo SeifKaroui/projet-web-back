@@ -19,6 +19,7 @@ import { AccessTokenGuard } from './common/guards/accessToken.guard';
 import { MailerModule } from '@nestjs-modules/mailer';
 
 import { UploadsModule } from './uploads/uploads.module';
+import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_TYPE, DB_USERNAME } from './common/db/db.constant';
 
 @Module({
   imports: [
@@ -28,12 +29,12 @@ import { UploadsModule } from './uploads/uploads.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
-        type: configService.get<string>('DB_TYPE') as any,
-        host: configService.get<string>('DB_HOST'),
-        port: +configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USERNAME'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_DATABASE'),
+        type: configService.get<string>(DB_TYPE) as any,
+        host: configService.get<string>(DB_HOST),
+        port: +configService.get<number>(DB_PORT),
+        username: configService.get<string>(DB_USERNAME),
+        password: configService.get<string>(DB_PASSWORD),
+        database: configService.get<string>(DB_DATABASE),
         synchronize: true,
         autoLoadEntities: true,
       }),

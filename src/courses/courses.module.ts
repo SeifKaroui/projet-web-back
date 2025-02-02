@@ -4,14 +4,15 @@ import { Course } from './entities/course.entity';
 import { CoursesController } from './courses.controller';
 import { CoursesService } from './courses.service';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { Result } from './entities/result.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Course]),
+    TypeOrmModule.forFeature([Course, Result]),
     MailerModule,
   ],
   exports: [TypeOrmModule, CoursesService],
   controllers: [CoursesController],
   providers: [CoursesService],
 })
-export class CoursesModule {}
+export class CoursesModule { }

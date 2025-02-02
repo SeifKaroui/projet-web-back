@@ -22,13 +22,13 @@ export class CommentController {
         return this.commentService.findAllByPost(postId);
     }
 
-   // Dans le contrôleur
-   @Delete(':postId/comments/:id') // Nouvelle route
-   async deleteComment(
-       @Param('postId', ParseIntPipe) postId: number, // ID du post
-       @Param('id', ParseIntPipe) id: number, // ID du commentaire
-   ) {
-       await this.commentService.deleteComment(id);
-       return { message: 'Comment deleted successfully' };
-   }
+
+    @Delete(':postId/comments/:id')
+    async deleteComment(
+        @Param('postId', ParseIntPipe) postId: number,
+        @Param('id', ParseIntPipe) id: number,
+    ) {
+        await this.commentService.deleteComment(id);
+        return { message: 'Comment deleted successfully' };
+    }
 }

@@ -13,9 +13,9 @@ import { Student } from '../../users/entities/user.entity';
 import { Absence } from '../../absences/entities/absence.entity';
 import { Post } from '../../posts/entities/post.entity';
 import { Homework } from '../../homework/entities/homework.entity';
-import { Result } from '../../results/entities/result.entity';
 import { DeleteDateColumn } from 'typeorm';
 import { HasId } from 'src/common/generics/has-id.interface';
+import { Result } from './result.entity';
 @Entity()
 export class Course implements HasId {
   @PrimaryGeneratedColumn()
@@ -37,6 +37,7 @@ export class Course implements HasId {
   courseCode: string;
   @DeleteDateColumn()
   deletedAt: Date;
+  
   @ManyToOne(() => Teacher, (teacher) => teacher.courses,{eager: true})
   @JoinColumn({ name: 'teacherId' })
   teacher: Teacher;
@@ -52,6 +53,7 @@ export class Course implements HasId {
 
   @OneToMany(() => Homework, (homework) => homework.course)
   homeworks: Homework[];
+
   @OneToMany(() => Result, (result) => result.course)
   results: Result[];
 }

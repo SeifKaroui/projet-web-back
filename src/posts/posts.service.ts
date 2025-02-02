@@ -127,6 +127,7 @@ export class PostsService extends CrudService<Post> {
     }
     return this.isUserEnrolledInCourse(user.id, courseId);
   }
+
   private async canDeletePost(user: JwtUser, postId: number): Promise<boolean> {
     const post = await this.postsRepository.findOne({
       where: { id: postId },
@@ -148,6 +149,7 @@ export class PostsService extends CrudService<Post> {
     }
     return false;
   }
+  
   async removePost(user: JwtUser, postId: number) {
     const canDeletePost: boolean = await this.canDeletePost(user, postId);
     if (!canDeletePost) {

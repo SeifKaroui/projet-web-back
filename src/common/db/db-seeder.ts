@@ -74,7 +74,7 @@ async function seedTeachers(dataSource: DataSource) {
 
   const teachers = await teacherRepository.save([
     {
-      id: uuidv4(), // Générer un UUID unique
+      id: "1", // Générer un UUID unique
       email: 'teacher1@email.com',
       firstName: 'John',
       lastName: 'Doe',
@@ -82,7 +82,7 @@ async function seedTeachers(dataSource: DataSource) {
       password: await argon2.hash('password'),
     },
     {
-      id: uuidv4(),
+      id: "2",
       email: 'prof.smith@university.com',
       firstName: 'Jane',
       lastName: 'Smith',
@@ -90,7 +90,7 @@ async function seedTeachers(dataSource: DataSource) {
       type: UserType.Teacher,
     },
     {
-      id: uuidv4(),
+      id: "3",
       email: 'prof.jones@university.com',
       firstName: 'Sarah',
       lastName: 'Jones',
@@ -98,7 +98,7 @@ async function seedTeachers(dataSource: DataSource) {
       type: UserType.Teacher,
     },
     {
-      id: uuidv4(),
+      id: "4",
       email: 'prof.brown@university.com',
       firstName: 'Michael',
       lastName: 'Brown',
@@ -115,7 +115,7 @@ async function seedStudents(dataSource: DataSource) {
 
   const students = await studentRepository.save([
     {
-      id: uuidv4(),
+      id: "5",
       email: 'student1@university.com',
       firstName: 'Mike',
       lastName: 'Wilson',
@@ -124,16 +124,16 @@ async function seedStudents(dataSource: DataSource) {
       type: UserType.Student,
     },
     {
-      id: uuidv4(),
+      id: "6",
       email: 'student2@university.com',
       firstName: 'Emma',
       lastName: 'Brown',
-      password: await argon2.hash('student123'),
+      password: await argon2.hash('student123'), 
       group: 'A1',
       type: UserType.Student,
     },
     {
-      id: uuidv4(),
+      id: "7",
       email: 'student3@university.com',
       firstName: 'James',
       lastName: 'Davis',
@@ -142,7 +142,7 @@ async function seedStudents(dataSource: DataSource) {
       type: UserType.Student,
     },
     {
-      id: uuidv4(),
+      id: "8",
       email: 'student4@university.com',
       firstName: 'Olivia',
       lastName: 'Miller',
@@ -151,7 +151,7 @@ async function seedStudents(dataSource: DataSource) {
       type: UserType.Student,
     },
     {
-      id: uuidv4(),
+      id: "9",
       email: 'student5@university.com',
       firstName: 'Liam',
       lastName: 'Johnson',
@@ -159,7 +159,7 @@ async function seedStudents(dataSource: DataSource) {
       group: 'A2',
       type: UserType.Student,
     },
-  ]);
+  ]) ;
 
   return students;
 }

@@ -38,32 +38,32 @@ async function seedPosts(dataSource: DataSource) {
   await postsRepository.save([
     {
       id: 1,
-      content: 'Welcome! Get ready to learn JS',
+      content: 'Bienvenue ! Préparez-vous à apprendre JS',
       course: { id: 1 },
     },
     {
       id: 2,
-      content: 'Welcome! Get ready to learn Node.js',
+      content: 'Bienvenue ! Préparez-vous à apprendre Node.js',
       course: { id: 2 },
     },
     {
       id: 3,
-      content: 'Welcome! Get ready to learn databases',
+      content: 'Bienvenue ! Préparez-vous à apprendre les bases de données',
       course: { id: 3 },
     },
     {
       id: 4,
-      content: 'SQL queries are essential for database management.',
+      content: 'Les requêtes SQL sont essentielles pour la gestion des bases de données.',
       course: { id: 3 },
     },
     {
       id: 5,
-      content: 'React is a powerful library for building UIs.',
+      content: 'React est une bibliothèque puissante pour construire des interfaces utilisateur.',
       course: { id: 4 },
     },
     {
       id: 6,
-      content: 'Python is great for data science and automation.',
+      content: 'Python est excellent pour la science des données et l\'automatisation.',
       course: { id: 5 },
     },
   ]);
@@ -75,34 +75,34 @@ async function seedTeachers(dataSource: DataSource) {
   const teachers = await teacherRepository.save([
     {
       id: uuidv4(), // Générer un UUID unique
-      email: 'teacher1@email.com',
-      firstName: 'John',
-      lastName: 'Doe',
+      email: 'prof1@email.com',
+      firstName: 'Jean',
+      lastName: 'Dupont',
       type: UserType.Teacher,
-      password: await argon2.hash('password'),
+      password: await argon2.hash('motdepasse'),
     },
     {
       id: uuidv4(),
-      email: 'prof.smith@university.com',
-      firstName: 'Jane',
+      email: 'prof.smith@universite.com',
+      firstName: 'Jeanne',
       lastName: 'Smith',
-      password: await argon2.hash('teacher123'),
+      password: await argon2.hash('prof123'),
       type: UserType.Teacher,
     },
     {
       id: uuidv4(),
-      email: 'prof.jones@university.com',
+      email: 'prof.jones@universite.com',
       firstName: 'Sarah',
       lastName: 'Jones',
-      password: await argon2.hash('teacher123'),
+      password: await argon2.hash('prof123'),
       type: UserType.Teacher,
     },
     {
       id: uuidv4(),
-      email: 'prof.brown@university.com',
-      firstName: 'Michael',
+      email: 'prof.brown@universite.com',
+      firstName: 'Michel',
       lastName: 'Brown',
-      password: await argon2.hash('teacher123'),
+      password: await argon2.hash('prof123'),
       type: UserType.Teacher,
     },
   ]);
@@ -116,46 +116,46 @@ async function seedStudents(dataSource: DataSource) {
   const students = await studentRepository.save([
     {
       id: uuidv4(),
-      email: 'student1@university.com',
-      firstName: 'Mike',
+      email: 'etudiant1@universite.com',
+      firstName: 'Michel',
       lastName: 'Wilson',
-      password: await argon2.hash('student123'),
+      password: await argon2.hash('etudiant123'),
       group: 'A1',
       type: UserType.Student,
     },
     {
       id: uuidv4(),
-      email: 'student2@university.com',
+      email: 'etudiant2@universite.com',
       firstName: 'Emma',
       lastName: 'Brown',
-      password: await argon2.hash('student123'),
+      password: await argon2.hash('etudiant123'),
       group: 'A1',
       type: UserType.Student,
     },
     {
       id: uuidv4(),
-      email: 'student3@university.com',
-      firstName: 'James',
+      email: 'etudiant3@universite.com',
+      firstName: 'Jacques',
       lastName: 'Davis',
-      password: await argon2.hash('student123'),
+      password: await argon2.hash('etudiant123'),
       group: 'B1',
       type: UserType.Student,
     },
     {
       id: uuidv4(),
-      email: 'student4@university.com',
+      email: 'etudiant4@universite.com',
       firstName: 'Olivia',
       lastName: 'Miller',
-      password: await argon2.hash('student123'),
+      password: await argon2.hash('etudiant123'),
       group: 'B1',
       type: UserType.Student,
     },
     {
       id: uuidv4(),
-      email: 'student5@university.com',
+      email: 'etudiant5@universite.com',
       firstName: 'Liam',
       lastName: 'Johnson',
-      password: await argon2.hash('student123'),
+      password: await argon2.hash('etudiant123'),
       group: 'A2',
       type: UserType.Student,
     },
@@ -174,9 +174,9 @@ async function seedCourses(
   const courses = await courseRepository.save([
     {
       id: 1,
-      title: 'Introduction to Programming',
-      description: 'Learn basics of programming with JavaScript',
-      type: 'lecture',
+      title: 'Introduction à la programmation',
+      description: 'Apprenez les bases de la programmation avec JavaScript',
+      type: 'cours',
       startDate: new Date('2024-03-01'),
       endDate: new Date('2024-06-30'),
       teacher: teachers[0],
@@ -184,9 +184,9 @@ async function seedCourses(
     },
     {
       id: 2,
-      title: 'Web Development',
-      description: 'Full stack web development with Node.js',
-      type: 'tutorial',
+      title: 'Développement Web',
+      description: 'Développement web full stack avec Node.js',
+      type: 'tutoriel',
       startDate: new Date('2024-03-01'),
       endDate: new Date('2024-06-30'),
       teacher: teachers[1],
@@ -194,9 +194,9 @@ async function seedCourses(
     },
     {
       id: 3,
-      title: 'Database Systems',
-      description: 'Introduction to SQL and NoSQL databases',
-      type: 'lecture',
+      title: 'Systèmes de bases de données',
+      description: 'Introduction aux bases de données SQL et NoSQL',
+      type: 'cours',
       startDate: new Date('2024-03-01'),
       endDate: new Date('2024-06-30'),
       teacher: teachers[0],
@@ -204,9 +204,9 @@ async function seedCourses(
     },
     {
       id: 4,
-      title: 'React for Beginners',
-      description: 'Learn React from scratch',
-      type: 'tutorial',
+      title: 'React pour débutants',
+      description: 'Apprenez React à partir de zéro',
+      type: 'tutoriel',
       startDate: new Date('2024-04-01'),
       endDate: new Date('2024-07-31'),
       teacher: teachers[2],
@@ -214,9 +214,9 @@ async function seedCourses(
     },
     {
       id: 5,
-      title: 'Python Programming',
-      description: 'Learn Python for data science and automation',
-      type: 'lecture',
+      title: 'Programmation en Python',
+      description: 'Apprenez Python pour la science des données et l\'automatisation',
+      type: 'cours',
       startDate: new Date('2024-05-01'),
       endDate: new Date('2024-08-31'),
       teacher: teachers[3],
@@ -237,56 +237,56 @@ async function seedHomework(
   await homeworkRepository.save([
     {
       id: 1,
-      title: 'Homework 1',
-      description: 'Create a simple JavaScript application',
+      title: 'Devoir 1',
+      description: 'Créez une application JavaScript simple',
       deadline: new Date('2025-03-15'),
       course: courses[0],
       teacher: teachers[0],
     },
     {
       id: 2,
-      title: 'Homework 2',
-      description: 'Build a REST API using Express.js',
+      title: 'Devoir 2',
+      description: 'Construisez une API REST avec Express.js',
       deadline: new Date('2024-03-20'),
       course: courses[1],
       teacher: teachers[1],
     },
     {
       id: 3,
-      title: 'Homework 3',
-      description: 'Design and implement a database schema',
+      title: 'Devoir 3',
+      description: 'Concevez et implémentez un schéma de base de données',
       deadline: new Date('2024-03-25'),
       course: courses[2],
       teacher: teachers[0],
     },
     {
       id: 4,
-      title: 'Homework 4',
-      description: 'Create unit tests for your API',
+      title: 'Devoir 4',
+      description: 'Créez des tests unitaires pour votre API',
       deadline: new Date('2024-04-01'),
       course: courses[1],
       teacher: teachers[1],
     },
     {
       id: 5,
-      title: 'Homework 5',
-      description: 'Build a React component',
+      title: 'Devoir 5',
+      description: 'Construisez un composant React',
       deadline: new Date('2024-04-10'),
       course: courses[3],
       teacher: teachers[2],
     },
     {
       id: 6,
-      title: 'Homework 6',
-      description: 'Write a Python script for data analysis',
+      title: 'Devoir 6',
+      description: 'Écrivez un script Python pour l\'analyse de données',
       deadline: new Date('2024-04-15'),
       course: courses[4],
       teacher: teachers[3],
     },
     {
       id: 7,
-      title: 'Homework 7',
-      description: 'Create a web serve in node',
+      title: 'Devoir 7',
+      description: 'Créez un serveur web en Node',
       deadline: new Date('2024-03-15'),
       course: courses[0],
       teacher: teachers[0],
@@ -302,7 +302,7 @@ async function seedAbsences(
   const absenceRepository = dataSource.getRepository(Absence);
 
   await absenceRepository.save([
-    // Student 1
+    // Étudiant 1
     {
       id: 1,
       student: students[0],
@@ -365,17 +365,17 @@ async function seedAbsences(
       course: courses[0],
       date: new Date('2024-03-18'),
       justified: true,
-      justification: 'Medical appointment',
+      justification: 'Rendez-vous médical',
     },
 
-    // Student 2
+    // Étudiant 2
     {
       id: 4,
       student: students[1],
       course: courses[1],
       date: new Date('2024-03-10'),
       justified: true,
-      justification: 'Family emergency',
+      justification: 'Urgence familiale',
     },
     {
       id: 5,
@@ -386,7 +386,7 @@ async function seedAbsences(
       justification: null,
     },
 
-    // Student 3
+    // Étudiant 3
     {
       id: 6,
       student: students[2],
@@ -401,7 +401,7 @@ async function seedAbsences(
       course: courses[2],
       date: new Date('2024-03-22'),
       justified: true,
-      justification: 'Technical issues',
+      justification: 'Problèmes techniques',
     },
     {
       id: 8,
@@ -412,14 +412,14 @@ async function seedAbsences(
       justification: null,
     },
 
-    // Student 4
+    // Étudiant 4
     {
       id: 9,
       student: students[3],
       course: courses[3],
       date: new Date('2024-04-05'),
       justified: true,
-      justification: 'Personal reasons',
+      justification: 'Raisons personnelles',
     },
     {
       id: 10,
@@ -430,7 +430,7 @@ async function seedAbsences(
       justification: null,
     },
 
-    // Student 5
+    // Étudiant 5
     {
       id: 11,
       student: students[4],
@@ -445,7 +445,7 @@ async function seedAbsences(
       course: courses[4],
       date: new Date('2024-05-08'),
       justified: true,
-      justification: 'Traveling',
+      justification: 'Voyage',
     },
   ]);
 }
